@@ -22,7 +22,6 @@ export interface CPTPPair {
 
 export interface MainInputData {
   cpTpPairs: CPTPPair[];
-  materiEsensial: string;
   jumlahPilihanGanda: number;
   jumlahPilihanGandaKompleks: number;
   jumlahIsian: number;

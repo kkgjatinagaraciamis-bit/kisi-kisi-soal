@@ -34,7 +34,7 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
     }
   };
 
-  const isComplete = data.cpTpPairs.every(p => p.cp && p.tp) && data.materiEsensial;
+  const isComplete = data.cpTpPairs.every(p => p.cp && p.tp);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-xl border border-[#B2DFDB]">
@@ -94,18 +94,6 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
           </div>
         ))}
 
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-[#00796B]">Materi Esensial</label>
-          <input
-            type="text"
-            name="materiEsensial"
-            value={data.materiEsensial}
-            onChange={handleChange}
-            placeholder="Contoh: Bilangan Cacah"
-            className="w-full px-4 py-2 rounded-lg border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all"
-            required
-          />
-        </div>
       </div>
 
       <div className="p-4 bg-[#F0F4F8] rounded-xl border border-[#B2DFDB] space-y-4">

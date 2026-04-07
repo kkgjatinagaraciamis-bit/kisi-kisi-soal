@@ -50,7 +50,6 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
               <p><span className="font-bold">Mata Pelajaran:</span> {identity.mataPelajaran}</p>
             </div>
             <div className="space-y-1">
-              <p><span className="font-bold">Topik Pembelajaran:</span> {mainInput.materiEsensial}</p>
               <p><span className="font-bold">Fase/Kelas/Semester:</span> {identity.fase}/{identity.kelas}/{identity.semester}</p>
               <p><span className="font-bold">Tahun Pelajaran:</span> {identity.tahunPelajaran}</p>
             </div>

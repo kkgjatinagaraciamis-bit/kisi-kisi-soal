@@ -23,7 +23,6 @@ export async function generateSoalAndKisiKisi(
     Content Details:
     - CP & TP Pairs:
       ${mainInput.cpTpPairs.map((p, i) => `Pair #${i + 1}:\n      CP: ${p.cp}\n      TP: ${p.tp}`).join('\n      ')}
-    - Material: ${mainInput.materiEsensial}
     - Question Counts: PG=${mainInput.jumlahPilihanGanda}, PG Kompleks=${mainInput.jumlahPilihanGandaKompleks}, Isian=${mainInput.jumlahIsian}, Uraian=${mainInput.jumlahUraian}
     - Cognitive Levels: L1=${mainInput.persenL1}%, L2=${mainInput.persenL2}%, L3=${mainInput.persenL3}%
     - Image Percentage: ${mainInput.persenGambar}% of questions should have an imagePrompt.

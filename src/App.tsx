@@ -29,7 +29,6 @@ export default function App() {
 
   const [mainInput, setMainInput] = useState<MainInputData>({
     cpTpPairs: [{ cp: '', tp: '' }],
-    materiEsensial: '',
     jumlahPilihanGanda: 10,
     jumlahPilihanGandaKompleks: 0,
     jumlahIsian: 5,
