@@ -66,7 +66,7 @@ export default function App() {
       <Header />
       
       <main className="pt-8 pb-20 px-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1600px] mx-auto">
           {/* Progress Bar */}
           <div className="mb-8 max-w-2xl mx-auto">
             <div className="flex justify-between mb-2">

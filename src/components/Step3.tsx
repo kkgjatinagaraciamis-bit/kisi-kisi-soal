@@ -12,7 +12,7 @@ interface Step3Props {
 
 export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBack, onDownload }) => {
   return (
-    <div className="space-y-12 max-w-6xl mx-auto p-6 pb-24">
+    <div className="space-y-12 max-w-[1400px] mx-auto p-6 pb-24">
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-lg border border-[#B2DFDB]">
         <div>
           <h2 className="text-2xl font-bold text-[#00695C]">Hasil Generate</h2>
