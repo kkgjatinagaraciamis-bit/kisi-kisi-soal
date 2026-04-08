@@ -64,10 +64,10 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
           new Paragraph({ text: "", spacing: { after: 200 } }),
 
-          // CP & TP SUMMARY
+          // CP & INDIKATOR SUMMARY
           new Paragraph({
             children: [
-              new TextRun({ text: "CAPAIAN & TUJUAN PEMBELAJARAN", bold: true, size: 24 }),
+              new TextRun({ text: "CAPAIAN & INDIKATOR", bold: true, size: 24 }),
             ],
             spacing: { before: 200, after: 100 },
           }),
@@ -80,7 +80,7 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
             }),
             new Paragraph({
               children: [
-                new TextRun({ text: `TP #${index + 1}: `, bold: true }),
+                new TextRun({ text: `Indikator #${index + 1}: `, bold: true }),
                 new TextRun(pair.tp),
               ],
               spacing: { after: 100 },

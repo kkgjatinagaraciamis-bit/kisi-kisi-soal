@@ -19,11 +19,11 @@ export default function App() {
     nipGuru: '',
     namaKepalaMadrasah: '',
     nipKepalaMadrasah: '',
-    tahunPelajaran: '',
-    semester: '',
+    tahunPelajaran: '2025/2026',
+    semester: '2 (Genap)',
     examType: 'simple',
-    fase: 'A',
-    kelas: '',
+    fase: 'Fase A',
+    kelas: 'Kelas 1',
     mataPelajaran: '',
   });
 

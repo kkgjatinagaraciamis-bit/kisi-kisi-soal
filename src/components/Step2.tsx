@@ -42,16 +42,16 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
         <h2 className="text-3xl font-extrabold text-[#00695C] tracking-tight">
           Input Bagian Utama {examType === 'hots' ? '(Mode HOTS)' : '(Mode Simple)'}
         </h2>
-        <p className="text-gray-500 font-medium">Tentukan Capaian Pembelajaran dan konfigurasi jumlah soal</p>
+        <p className="text-gray-500 font-medium">Tentukan Capaian Pembelajaran dan konfigurasi Indikator</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: CP & TP Pairs */}
+        {/* Left Column: CP & Indikator Pairs */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between border-b border-[#B2DFDB] pb-2">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-6 bg-[#00897B] rounded-full"></div>
-              <h3 className="font-bold text-[#00796B] uppercase tracking-wider text-sm">Capaian & Tujuan Pembelajaran</h3>
+              <h3 className="font-bold text-[#00796B] uppercase tracking-wider text-sm">Capaian & Indikator</h3>
             </div>
             <button
               type="button"
@@ -61,7 +61,7 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
-              <span>Tambah CP/TP</span>
+              <span>Tambah CP/Indikator</span>
             </button>
           </div>
 
@@ -93,12 +93,12 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-[#00796B] uppercase tracking-wide">Tujuan Pembelajaran (TP) #{index + 1}</label>
+                  <label className="text-xs font-bold text-[#00796B] uppercase tracking-wide">Indikator #{index + 1}</label>
                   <textarea
                     value={pair.tp}
                     onChange={(e) => handleCPTPChange(index, 'tp', e.target.value)}
                     rows={3}
-                    placeholder="Masukkan TP..."
+                    placeholder="Masukkan Indikator..."
                     className="w-full px-4 py-3 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all resize-none bg-white"
                     required
                   />

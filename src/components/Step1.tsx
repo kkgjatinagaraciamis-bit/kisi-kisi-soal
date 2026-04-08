@@ -152,23 +152,29 @@ export const Step1: React.FC<Step1Props> = ({ data, onChange, onNext }) => {
                 required
               >
                 <option value="">Pilih Fase</option>
-                <option value="A">Fase A (Kelas 1-2)</option>
-                <option value="B">Fase B (Kelas 3-4)</option>
-                <option value="C">Fase C (Kelas 5-6)</option>
+                <option value="Fase A">Fase A</option>
+                <option value="Fase B">Fase B</option>
+                <option value="Fase C">Fase C</option>
               </select>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-[#00796B]">Pilihan Kelas</label>
-              <input
-                type="text"
+              <select
                 name="kelas"
                 value={data.kelas}
                 onChange={handleChange}
-                placeholder="Contoh: 1, 2, 3..."
                 className="w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all bg-gray-50/50 focus:bg-white"
                 required
-              />
+              >
+                <option value="">Pilih Kelas</option>
+                <option value="Kelas 1">Kelas 1</option>
+                <option value="Kelas 2">Kelas 2</option>
+                <option value="Kelas 3">Kelas 3</option>
+                <option value="Kelas 4">Kelas 4</option>
+                <option value="Kelas 5">Kelas 5</option>
+                <option value="Kelas 6">Kelas 6</option>
+              </select>
             </div>
 
             <div className="space-y-2 md:col-span-2">

@@ -21,8 +21,8 @@ export async function generateSoalAndKisiKisi(
     - Exam Mode: ${identity.examType.toUpperCase()}
     
     Content Details:
-    - CP & TP Pairs:
-      ${mainInput.cpTpPairs.map((p, i) => `Pair #${i + 1}:\n      CP: ${p.cp}\n      TP: ${p.tp}`).join('\n      ')}
+    - CP & Indikator Pairs:
+      ${mainInput.cpTpPairs.map((p, i) => `Pair #${i + 1}:\n      CP: ${p.cp}\n      Indikator: ${p.tp}`).join('\n      ')}
     - Question Counts: PG=${mainInput.jumlahPilihanGanda}, PG Kompleks=${mainInput.jumlahPilihanGandaKompleks}, Isian=${mainInput.jumlahIsian}, Uraian=${mainInput.jumlahUraian}
     - Cognitive Levels: L1=${mainInput.persenL1}%, L2=${mainInput.persenL2}%, L3=${mainInput.persenL3}%
     - Image Percentage: ${mainInput.persenGambar}% of questions should have an imagePrompt.
@@ -33,7 +33,7 @@ export async function generateSoalAndKisiKisi(
     - L3 = C5, C6 (Evaluating, Creating)
     - If Exam Mode is HOTS, focus on L2 and L3 levels with complex scenarios.
     - Pilihan Ganda Kompleks: Questions where students can choose more than one correct answer (provide 5 options a-e).
-    - Indicators must be derived from TP.
+    - Indicators must be derived from the provided Indikator field.
     - Questions must be in Indonesian (Bahasa Indonesia).
     - For PG, provide 4 options (a, b, c, d).
     - For questions that might need an image, provide a descriptive 'imagePrompt'.
