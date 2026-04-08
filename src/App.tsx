@@ -30,7 +30,7 @@ export default function App() {
   const [mainInput, setMainInput] = useState<MainInputData>({
     cpTpPairs: [{ cp: '', tp: '' }],
     jumlahPilihanGanda: 10,
-    jumlahPilihanGandaKompleks: 0,
+    jumlahPilihanGandaKompleks: 5,
     jumlahIsian: 5,
     jumlahUraian: 5,
     persenL1: 30,

@@ -171,31 +171,94 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
           }),
 
           // SOAL CONTENT
-          ...output.soal.map(s => [
-            new Paragraph({
-              children: [
-                new TextRun({ text: `${s.no}. `, bold: true }),
-                new TextRun(s.pertanyaan),
-              ],
-              spacing: { before: 200 },
-            }),
-            ...(s.tipe === "Pilihan Ganda" || s.tipe === "Pilihan Ganda Kompleks" ? [
-              new Paragraph({ 
-                text: `a. ${s.opsi?.a}    b. ${s.opsi?.b}` 
-              }),
-              new Paragraph({ 
-                text: `c. ${s.opsi?.c}    d. ${s.opsi?.d}${s.opsi?.e ? `    e. ${s.opsi?.e}` : ''}` 
-              }),
-            ] : []),
-            ...(s.imagePrompt ? [
-              new Paragraph({
-                children: [
-                  new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true }),
-                ],
-                spacing: { before: 100, after: 100 },
-              })
-            ] : [])
-          ]).flat(),
+          ...(() => {
+            const pg = output.soal.filter(s => s.tipe === "Pilihan Ganda");
+            const pgk = output.soal.filter(s => s.tipe === "Pilihan Ganda Kompleks");
+            const isian = output.soal.filter(s => s.tipe === "Isian");
+            const uraian = output.soal.filter(s => s.tipe === "Uraian");
+
+            const result: any[] = [];
+
+            if (pg.length > 0) {
+              result.push(new Paragraph({
+                children: [new TextRun({ text: "I. Berilah tanda silang (x) pada huruf a, b, c, atau d di depan jawaban yang paling benar!", bold: true })],
+                spacing: { before: 200, after: 100 },
+                border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+              }));
+              pg.forEach(s => {
+                result.push(new Paragraph({
+                  children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                  spacing: { before: 200 },
+                }));
+                result.push(new Paragraph({ text: `a. ${s.opsi?.a}    b. ${s.opsi?.b}` }));
+                result.push(new Paragraph({ text: `c. ${s.opsi?.c}    d. ${s.opsi?.d}` }));
+                if (s.imagePrompt) {
+                  result.push(new Paragraph({ children: [new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true })], spacing: { before: 100, after: 100 } }));
+                }
+              });
+            }
+
+            if (pgk.length > 0) {
+              result.push(new Paragraph({
+                children: [new TextRun({ text: "II. Berilah tanda silang (x) pada huruf a, b, c, d, atau e di depan jawaban yang paling benar (Jawaban dapat lebih dari satu)!", bold: true })],
+                spacing: { before: 400, after: 100 },
+                border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+              }));
+              pgk.forEach(s => {
+                result.push(new Paragraph({
+                  children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                  spacing: { before: 200 },
+                }));
+                result.push(new Paragraph({ text: `a. ${s.opsi?.a}    b. ${s.opsi?.b}` }));
+                result.push(new Paragraph({ text: `c. ${s.opsi?.c}    d. ${s.opsi?.d}${s.opsi?.e ? `    e. ${s.opsi?.e}` : ''}` }));
+                if (s.imagePrompt) {
+                  result.push(new Paragraph({ children: [new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true })], spacing: { before: 100, after: 100 } }));
+                }
+              });
+            }
+
+            if (isian.length > 0) {
+              const sectionNum = pgk.length > 0 ? "III" : "II";
+              result.push(new Paragraph({
+                children: [new TextRun({ text: `${sectionNum}. Isilah titik-titik di bawah ini dengan jawaban yang tepat!`, bold: true })],
+                spacing: { before: 400, after: 100 },
+                border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+              }));
+              isian.forEach(s => {
+                result.push(new Paragraph({
+                  children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                  spacing: { before: 200 },
+                }));
+                if (s.imagePrompt) {
+                  result.push(new Paragraph({ children: [new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true })], spacing: { before: 100, after: 100 } }));
+                }
+              });
+            }
+
+            if (uraian.length > 0) {
+              let sectionNum = "III";
+              if (pgk.length > 0 && isian.length > 0) sectionNum = "IV";
+              else if (pgk.length > 0 || isian.length > 0) sectionNum = "III";
+              else sectionNum = "II";
+
+              result.push(new Paragraph({
+                children: [new TextRun({ text: `${sectionNum}. Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!`, bold: true })],
+                spacing: { before: 400, after: 100 },
+                border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+              }));
+              uraian.forEach(s => {
+                result.push(new Paragraph({
+                  children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                  spacing: { before: 200 },
+                }));
+                if (s.imagePrompt) {
+                  result.push(new Paragraph({ children: [new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true })], spacing: { before: 100, after: 100 } }));
+                }
+              });
+            }
+
+            return result;
+          })(),
 
           // PAGE BREAK FOR KUNCI
           new Paragraph({ text: "", pageBreakBefore: true }),
