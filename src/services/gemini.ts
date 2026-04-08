@@ -31,9 +31,13 @@ export async function generateSoalAndKisiKisi(
     - L1 = C1, C2 (Remembering, Understanding)
     - L2 = C3, C4 (Applying, Analyzing)
     - L3 = C5, C6 (Evaluating, Creating)
-    - If Exam Mode is HOTS, focus on L2 and L3 levels with complex scenarios.
+    - HOTS Mode Requirements:
+      * Focus heavily on L2 and L3 levels.
+      * Indicators in Kisi-kisi MUST follow the pattern: [Stimulus] + Murid + [Indikator] + [Keterangan].
+      * Example Indicator: "Disajikan peristiwa singkat tentang Asmaul husna As-Sami', Murid Menjelaskan makna al-Asma' al-Husna (as-Sami') dengan benar".
+      * Questions MUST be based on the stimulus provided in the indicator (e.g., start with a short story, case study, table, or image).
     - Pilihan Ganda Kompleks: Questions where students can choose more than one correct answer (provide 5 options a-e).
-    - Indicators must be derived from the provided Indikator field.
+    - Indicators must be derived from the provided Indikator field in the input, but enhanced with the stimulus pattern for HOTS.
     - Questions must be in Indonesian (Bahasa Indonesia).
     - For PG, provide 4 options (a, b, c, d).
     - For questions that might need an image, provide a descriptive 'imagePrompt'.
