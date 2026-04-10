@@ -13,7 +13,10 @@ interface Step2Props {
 export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, onGenerate, isLoading }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    const val = type === 'number' ? parseInt(value) || 0 : value;
+    let val: any = value;
+    if (type === 'number' || name === 'jumlahOpsiPG' || name === 'jumlahOpsiPGK') {
+      val = parseInt(value) || 0;
+    }
     onChange({ ...data, [name]: val });
   };
 
@@ -170,7 +173,7 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
               <div className="w-2 h-6 bg-[#00897B] rounded-full"></div>
               <h3 className="font-bold text-[#00796B] uppercase tracking-wider text-sm">Level Kognitif (%)</h3>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-[#00796B] uppercase">L1</label>
                 <input
@@ -205,30 +208,84 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
                 />
               </div>
             </div>
-            <p className="text-[10px] text-[#00796B] italic">Total harus 100% untuk hasil optimal.</p>
+            {(() => {
+              const total = (Number(data.persenL1) || 0) + (Number(data.persenL2) || 0) + (Number(data.persenL3) || 0);
+              return (
+                <div className="space-y-1">
+                  <p className={`text-[10px] italic ${total > 100 ? 'text-red-600 font-bold' : 'text-[#00796B]'}`}>
+                    Total: {total}% {total > 100 ? '(Melebihi 100%!)' : '(Total harus 100% untuk hasil optimal)'}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
 
-          {/* Visual & Gambar (HOTS Only) */}
-          {examType === 'hots' && (
-            <div className="p-6 bg-[#E0F2F1] rounded-3xl border border-[#B2DFDB] space-y-6 shadow-sm">
-              <div className="flex items-center space-x-2 border-b border-[#B2DFDB] pb-2">
-                <div className="w-2 h-6 bg-[#00897B] rounded-full"></div>
-                <h3 className="font-bold text-[#00796B] uppercase tracking-wider text-sm">Visual & Gambar</h3>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-[#00796B]">Prosentase Gambar (%)</label>
-                <input
-                  type="number"
-                  name="persenGambar"
-                  value={data.persenGambar}
+          {/* Visual & Gambar */}
+          <div className={`p-6 bg-[#E0F2F1] rounded-3xl border border-[#B2DFDB] space-y-6 shadow-sm transition-all ${examType === 'simple' ? 'opacity-60 grayscale-[0.3]' : ''}`}>
+            <div className="flex items-center space-x-2 border-b border-[#B2DFDB] pb-2">
+              <div className="w-2 h-6 bg-[#00897B] rounded-full"></div>
+              <h3 className="font-bold text-[#00796B] uppercase tracking-wider text-sm">Visual & Gambar</h3>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#00796B]">Prosentase Gambar (%)</label>
+              <input
+                type="number"
+                name="persenGambar"
+                value={examType === 'simple' ? 0 : data.persenGambar}
+                onChange={handleChange}
+                disabled={examType === 'simple'}
+                className={`w-full px-3 py-2 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] outline-none transition-all ${examType === 'simple' ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                min="0"
+                max="100"
+              />
+              {examType === 'simple' ? (
+                <p className="text-[10px] text-[#00796B] italic font-bold">Menu ini hanya aktif pada Mode Soal HOTS.</p>
+              ) : (
+                <>
+                  {Number(data.persenGambar) > 40 && (
+                    <p className="text-[10px] text-red-600 font-bold italic">
+                      Peringatan: Prosentase gambar maksimal 40%!
+                    </p>
+                  )}
+                  <p className="text-[10px] text-[#00796B] italic">Maksimal 40% untuk performa terbaik.</p>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Konfigurasi Opsi */}
+          <div className="p-6 bg-[#F0F4F8] rounded-3xl border border-[#B2DFDB] space-y-6 shadow-sm">
+            <div className="flex items-center space-x-2 border-b border-[#B2DFDB] pb-2">
+              <div className="w-2 h-6 bg-[#00897B] rounded-full"></div>
+              <h3 className="font-bold text-[#00796B] uppercase tracking-wider text-sm">Konfigurasi Opsi</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#00796B]">Opsi Pilihan Ganda</label>
+                <select
+                  name="jumlahOpsiPG"
+                  value={data.jumlahOpsiPG}
                   onChange={handleChange}
                   className="w-full px-3 py-2 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] outline-none transition-all bg-white"
-                  min="0"
-                  max="100"
-                />
+                >
+                  <option value={3}>3 Opsi (a, b, c)</option>
+                  <option value={4}>4 Opsi (a, b, c, d)</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#00796B]">Opsi PG Kompleks</label>
+                <select
+                  name="jumlahOpsiPGK"
+                  value={data.jumlahOpsiPGK}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] outline-none transition-all bg-white"
+                >
+                  <option value={3}>3 Opsi (a, b, c)</option>
+                  <option value={4}>4 Opsi (a, b, c, d)</option>
+                </select>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 

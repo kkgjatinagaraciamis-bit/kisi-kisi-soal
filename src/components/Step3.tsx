@@ -145,41 +145,109 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
           </div>
 
           {/* Pilihan Ganda */}
-          {output.soal.filter(s => s.tipe === 'Pilihan Ganda').length > 0 && (
-            <div className="space-y-6">
-              <h5 className="font-bold border-b pb-1">I. Berilah tanda silang (x) pada huruf a, b, c, atau d di depan jawaban yang paling benar!</h5>
-              {output.soal.filter(s => s.tipe === 'Pilihan Ganda').map((s, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex space-x-2">
-                    <span className="font-bold">{s.no}.</span>
-                    <div className="flex-1">
-                      <p className="leading-relaxed">{s.pertanyaan}</p>
-                      {s.imagePrompt && (
-                        <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                          <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
-                          <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
-                        </div>
-                      )}
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <p>a. {s.opsi?.a}</p>
-                        <p>b. {s.opsi?.b}</p>
-                        <p>c. {s.opsi?.c}</p>
-                        <p>d. {s.opsi?.d}</p>
+          {(() => {
+            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
+            if (pgSoal.length === 0) return null;
+            
+            const count = Number(mainInput.jumlahOpsiPG);
+            const optionsStr = count === 3 ? 'a, b, atau c' : count === 4 ? 'a, b, c, atau d' : 'a, b, c, d, atau e';
+            
+            return (
+              <div className="space-y-6">
+                <h5 className="font-bold border-b pb-1">
+                  I. Berilah tanda silang (x) pada huruf {optionsStr} di depan jawaban yang paling benar!
+                </h5>
+                {pgSoal.map((s, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex space-x-2">
+                      <span className="font-bold">{s.no}.</span>
+                      <div className="flex-1">
+                        <p className="leading-relaxed">{s.pertanyaan}</p>
+                        {s.imagePrompt && (
+                          <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                            <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
+                            <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
+                          </div>
+                        )}
+                        {s.opsi && (
+                          <div className="flex flex-col gap-1 mt-2">
+                            <p>a. {s.opsi.a}</p>
+                            <p>b. {s.opsi.b}</p>
+                            {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
+                            {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
+                            {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
 
           {/* Pilihan Ganda Kompleks */}
-          {output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks').length > 0 && (
-            <div className="space-y-6 pt-8">
-              <h5 className="font-bold border-b pb-1">II. Berilah tanda silang (x) pada huruf a, b, c, d, atau e di depan jawaban yang paling benar (Jawaban dapat lebih dari satu)!</h5>
-              {output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks').map((s, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex space-x-2">
+          {(() => {
+            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
+            const pgkSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks');
+            if (pgkSoal.length === 0) return null;
+            
+            const sectionNum = pgSoal.length > 0 ? "II" : "I";
+            const count = Number(mainInput.jumlahOpsiPGK);
+            const optionsStr = count === 3 ? 'a, b, atau c' : count === 4 ? 'a, b, c, atau d' : 'a, b, c, d, atau e';
+            
+            return (
+              <div className="space-y-6 pt-8">
+                <h5 className="font-bold border-b pb-1">
+                  {sectionNum}. Berilah tanda silang (x) pada huruf {optionsStr} di depan jawaban yang paling benar (Pilih 2 jawaban yang benar)!
+                </h5>
+                {pgkSoal.map((s, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex space-x-2">
+                      <span className="font-bold">{s.no}.</span>
+                      <div className="flex-1">
+                        <p className="leading-relaxed">{s.pertanyaan}</p>
+                        {s.imagePrompt && (
+                          <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                            <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
+                            <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
+                          </div>
+                        )}
+                        {s.opsi && (
+                          <div className="flex flex-col gap-1 mt-2">
+                            <p>a. {s.opsi.a}</p>
+                            <p>b. {s.opsi.b}</p>
+                            {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
+                            {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
+                            {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
+          {/* Isian */}
+          {(() => {
+            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
+            const pgkSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks');
+            const isianSoal = output.soal.filter(s => s.tipe === 'Isian');
+            if (isianSoal.length === 0) return null;
+            
+            let sectionInt = 1;
+            if (pgSoal.length > 0) sectionInt++;
+            if (pgkSoal.length > 0) sectionInt++;
+            
+            const roman = ["I", "II", "III", "IV"][sectionInt - 1];
+            
+            return (
+              <div className="space-y-6 pt-8">
+                <h5 className="font-bold border-b pb-1">{roman}. Isilah titik-titik di bawah ini dengan jawaban yang tepat!</h5>
+                {isianSoal.map((s, i) => (
+                  <div key={i} className="flex space-x-2">
                     <span className="font-bold">{s.no}.</span>
                     <div className="flex-1">
                       <p className="leading-relaxed">{s.pertanyaan}</p>
@@ -189,63 +257,50 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                           <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
                         </div>
                       )}
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <p>a. {s.opsi?.a}</p>
-                        <p>b. {s.opsi?.b}</p>
-                        <p>c. {s.opsi?.c}</p>
-                        <p>d. {s.opsi?.d}</p>
-                        {s.opsi?.e && <p>e. {s.opsi?.e}</p>}
-                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Isian */}
-          {output.soal.filter(s => s.tipe === 'Isian').length > 0 && (
-            <div className="space-y-6 pt-8">
-              <h5 className="font-bold border-b pb-1">{output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks').length > 0 ? 'III' : 'II'}. Isilah titik-titik di bawah ini dengan jawaban yang tepat!</h5>
-              {output.soal.filter(s => s.tipe === 'Isian').map((s, i) => (
-                <div key={i} className="flex space-x-2">
-                  <span className="font-bold">{s.no}.</span>
-                  <div className="flex-1">
-                    <p className="leading-relaxed">{s.pertanyaan}</p>
-                    {s.imagePrompt && (
-                      <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                        <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
-                        <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
 
           {/* Uraian */}
-          {output.soal.filter(s => s.tipe === 'Uraian').length > 0 && (
-            <div className="space-y-6 pt-8">
-              <h5 className="font-bold border-b pb-1">
-                {output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks').length > 0 ? 'IV' : 'III'}. Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!
-              </h5>
-              {output.soal.filter(s => s.tipe === 'Uraian').map((s, i) => (
-                <div key={i} className="flex space-x-2">
-                  <span className="font-bold">{s.no}.</span>
-                  <div className="flex-1">
-                    <p className="leading-relaxed">{s.pertanyaan}</p>
-                    {s.imagePrompt && (
-                      <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                        <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
-                        <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
-                      </div>
-                    )}
+          {(() => {
+            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
+            const pgkSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks');
+            const isianSoal = output.soal.filter(s => s.tipe === 'Isian');
+            const uraianSoal = output.soal.filter(s => s.tipe === 'Uraian');
+            if (uraianSoal.length === 0) return null;
+            
+            let sectionInt = 1;
+            if (pgSoal.length > 0) sectionInt++;
+            if (pgkSoal.length > 0) sectionInt++;
+            if (isianSoal.length > 0) sectionInt++;
+            
+            const roman = ["I", "II", "III", "IV"][sectionInt - 1];
+            
+            return (
+              <div className="space-y-6 pt-8">
+                <h5 className="font-bold border-b pb-1">
+                  {roman}. Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!
+                </h5>
+                {uraianSoal.map((s, i) => (
+                  <div key={i} className="flex space-x-2">
+                    <span className="font-bold">{s.no}.</span>
+                    <div className="flex-1">
+                      <p className="leading-relaxed">{s.pertanyaan}</p>
+                      {s.imagePrompt && (
+                        <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                          <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
+                          <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </section>
 

@@ -30,6 +30,8 @@ export interface MainInputData {
   persenL2: number;
   persenL3: number;
   persenGambar: number;
+  jumlahOpsiPG: number;
+  jumlahOpsiPGK: number;
 }
 
 export interface Question {

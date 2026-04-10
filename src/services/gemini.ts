@@ -36,10 +36,14 @@ export async function generateSoalAndKisiKisi(
       * Indicators in Kisi-kisi MUST follow the pattern: [Stimulus] + Murid + [Indikator] + [Keterangan].
       * Example Indicator: "Disajikan peristiwa singkat tentang Asmaul husna As-Sami', Murid Menjelaskan makna al-Asma' al-Husna (as-Sami') dengan benar".
       * Questions MUST be based on the stimulus provided in the indicator (e.g., start with a short story, case study, table, or image).
-    - Pilihan Ganda Kompleks: Questions where students can choose more than one correct answer (provide 5 options a-e).
+    - Stimulus Guidelines:
+      * If Exam Mode is SIMPLE: The stimulus in the question must be brief and concise (1-2 short sentences).
+      * If Exam Mode is HOTS: The stimulus in the question must be longer, providing more context or a short story (3-5 sentences).
+    - Pilihan Ganda (PG): Provide exactly ${mainInput.jumlahOpsiPG} options.
+    - Pilihan Ganda Kompleks (PGK): Questions where students can choose more than one correct answer. Provide exactly ${mainInput.jumlahOpsiPGK} options and ensure exactly 2 correct answers for each PGK question.
+    - For Isian and Uraian, DO NOT provide any options (opsi).
     - Indicators must be derived from the provided Indikator field in the input, but enhanced with the stimulus pattern for HOTS.
     - Questions must be in Indonesian (Bahasa Indonesia).
-    - For PG, provide 4 options (a, b, c, d).
     - For questions that might need an image, provide a descriptive 'imagePrompt'.
     - Ensure the number of questions matches the requested counts.
     - Distribute cognitive levels according to the percentages.

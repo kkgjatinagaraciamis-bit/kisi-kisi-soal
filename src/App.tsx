@@ -37,6 +37,8 @@ export default function App() {
     persenL2: 40,
     persenL3: 30,
     persenGambar: 20,
+    jumlahOpsiPG: 4,
+    jumlahOpsiPGK: 5,
   });
 
   const [output, setOutput] = useState<GeneratorOutput | null>(null);

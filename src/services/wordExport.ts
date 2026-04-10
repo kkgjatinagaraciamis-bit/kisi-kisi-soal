@@ -178,10 +178,13 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
             const uraian = output.soal.filter(s => s.tipe === "Uraian");
 
             const result: any[] = [];
+            let sectionInt = 1;
 
             if (pg.length > 0) {
+              const count = Number(mainInput.jumlahOpsiPG);
+              const optionsStr = count === 3 ? "a, b, atau c" : count === 4 ? "a, b, c, atau d" : "a, b, c, d, atau e";
               result.push(new Paragraph({
-                children: [new TextRun({ text: "I. Berilah tanda silang (x) pada huruf a, b, c, atau d di depan jawaban yang paling benar!", bold: true })],
+                children: [new TextRun({ text: `I. Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar!`, bold: true })],
                 spacing: { before: 200, after: 100 },
                 border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
               }));
@@ -190,17 +193,28 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
                   spacing: { before: 200 },
                 }));
-                result.push(new Paragraph({ text: `a. ${s.opsi?.a}    b. ${s.opsi?.b}` }));
-                result.push(new Paragraph({ text: `c. ${s.opsi?.c}    d. ${s.opsi?.d}` }));
+                
+                if (s.opsi) {
+                  result.push(new Paragraph({ text: `a. ${s.opsi.a}` }));
+                  result.push(new Paragraph({ text: `b. ${s.opsi.b}` }));
+                  if (s.opsi.c) result.push(new Paragraph({ text: `c. ${s.opsi.c}` }));
+                  if (s.opsi.d) result.push(new Paragraph({ text: `d. ${s.opsi.d}` }));
+                  if (s.opsi.e) result.push(new Paragraph({ text: `e. ${s.opsi.e}` }));
+                }
+                
                 if (s.imagePrompt) {
                   result.push(new Paragraph({ children: [new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true })], spacing: { before: 100, after: 100 } }));
                 }
               });
+              sectionInt++;
             }
 
             if (pgk.length > 0) {
+              const roman = ["I", "II", "III", "IV"][sectionInt - 1];
+              const count = Number(mainInput.jumlahOpsiPGK);
+              const optionsStr = count === 3 ? "a, b, atau c" : count === 4 ? "a, b, c, atau d" : "a, b, c, d, atau e";
               result.push(new Paragraph({
-                children: [new TextRun({ text: "II. Berilah tanda silang (x) pada huruf a, b, c, d, atau e di depan jawaban yang paling benar (Jawaban dapat lebih dari satu)!", bold: true })],
+                children: [new TextRun({ text: `${roman}. Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar (Pilih 2 jawaban yang benar)!`, bold: true })],
                 spacing: { before: 400, after: 100 },
                 border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
               }));
@@ -209,18 +223,26 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
                   spacing: { before: 200 },
                 }));
-                result.push(new Paragraph({ text: `a. ${s.opsi?.a}    b. ${s.opsi?.b}` }));
-                result.push(new Paragraph({ text: `c. ${s.opsi?.c}    d. ${s.opsi?.d}${s.opsi?.e ? `    e. ${s.opsi?.e}` : ''}` }));
+                
+                if (s.opsi) {
+                  result.push(new Paragraph({ text: `a. ${s.opsi.a}` }));
+                  result.push(new Paragraph({ text: `b. ${s.opsi.b}` }));
+                  if (s.opsi.c) result.push(new Paragraph({ text: `c. ${s.opsi.c}` }));
+                  if (s.opsi.d) result.push(new Paragraph({ text: `d. ${s.opsi.d}` }));
+                  if (s.opsi.e) result.push(new Paragraph({ text: `e. ${s.opsi.e}` }));
+                }
+
                 if (s.imagePrompt) {
                   result.push(new Paragraph({ children: [new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true })], spacing: { before: 100, after: 100 } }));
                 }
               });
+              sectionInt++;
             }
 
             if (isian.length > 0) {
-              const sectionNum = pgk.length > 0 ? "III" : "II";
+              const roman = ["I", "II", "III", "IV"][sectionInt - 1];
               result.push(new Paragraph({
-                children: [new TextRun({ text: `${sectionNum}. Isilah titik-titik di bawah ini dengan jawaban yang tepat!`, bold: true })],
+                children: [new TextRun({ text: `${roman}. Isilah titik-titik di bawah ini dengan jawaban yang tepat!`, bold: true })],
                 spacing: { before: 400, after: 100 },
                 border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
               }));
@@ -233,16 +255,13 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   result.push(new Paragraph({ children: [new TextRun({ text: `[BOX GAMBAR: ${s.imagePrompt}]`, italics: true })], spacing: { before: 100, after: 100 } }));
                 }
               });
+              sectionInt++;
             }
 
             if (uraian.length > 0) {
-              let sectionNum = "III";
-              if (pgk.length > 0 && isian.length > 0) sectionNum = "IV";
-              else if (pgk.length > 0 || isian.length > 0) sectionNum = "III";
-              else sectionNum = "II";
-
+              const roman = ["I", "II", "III", "IV"][sectionInt - 1];
               result.push(new Paragraph({
-                children: [new TextRun({ text: `${sectionNum}. Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!`, bold: true })],
+                children: [new TextRun({ text: `${roman}. Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!`, bold: true })],
                 spacing: { before: 400, after: 100 },
                 border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
               }));
