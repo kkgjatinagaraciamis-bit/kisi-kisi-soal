@@ -50,7 +50,11 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
               <p><span className="font-bold">Mata Pelajaran:</span> {identity.mataPelajaran}</p>
             </div>
             <div className="space-y-1">
-              <p><span className="font-bold">Fase/Kelas/Semester:</span> {identity.fase}/{identity.kelas}/{identity.semester}</p>
+              {identity.jenisUjian === 'UJIAN MADRASAH' ? (
+                <p className="font-bold text-lg">UJIAN MADRASAH</p>
+              ) : (
+                <p><span className="font-bold">Fase/Kelas/Semester:</span> {identity.fase}/{identity.kelas}/{identity.semester}</p>
+              )}
               <p><span className="font-bold">Tahun Pelajaran:</span> {identity.tahunPelajaran}</p>
             </div>
           </div>
@@ -126,7 +130,11 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
           <div className="grid grid-cols-2 gap-4 text-sm border p-4 rounded-lg mb-8">
             <div className="space-y-1">
               <p><span className="inline-block w-32">Mata Pelajaran</span>: {identity.mataPelajaran}</p>
-              <p><span className="inline-block w-32">Kelas/Semester</span>: {identity.kelas} / {identity.semester}</p>
+              {identity.jenisUjian === 'UJIAN MADRASAH' ? (
+                <p className="font-bold">UJIAN MADRASAH</p>
+              ) : (
+                <p><span className="inline-block w-32">Kelas/Semester</span>: {identity.kelas} / {identity.semester}</p>
+              )}
             </div>
             <div className="space-y-1">
               <p><span className="inline-block w-32">Tahun Pelajaran</span>: {identity.tahunPelajaran}</p>

@@ -58,7 +58,15 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
               new TableRow({
                 children: [
                   new TableCell({ children: [new Paragraph(`Nama Guru: ${identity.namaGuru}`)] }),
-                  new TableCell({ children: [new Paragraph(`Fase/Kelas/Sem: ${identity.fase}/${identity.kelas}/${identity.semester}`)] }),
+                  new TableCell({ 
+                    children: [
+                      new Paragraph(
+                        identity.jenisUjian === 'UJIAN MADRASAH' 
+                        ? "UJIAN MADRASAH" 
+                        : `Fase/Kelas/Sem: ${identity.fase}/${identity.kelas}/${identity.semester}`
+                      )
+                    ] 
+                  }),
                 ],
               }),
               new TableRow({
