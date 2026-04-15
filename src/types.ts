@@ -26,6 +26,8 @@ export interface MainInputData {
   jumlahPilihanGandaKompleks: number;
   jumlahIsian: number;
   jumlahUraian: number;
+  jumlahMenjodohkan: number;
+  jumlahBenarSalah: number;
   persenL1: number;
   persenL2: number;
   persenL3: number;
@@ -36,7 +38,7 @@ export interface MainInputData {
 
 export interface Question {
   no: number;
-  tipe: 'Pilihan Ganda' | 'Pilihan Ganda Kompleks' | 'Isian' | 'Uraian';
+  tipe: 'Pilihan Ganda' | 'Pilihan Ganda Kompleks' | 'Isian' | 'Uraian' | 'Menjodohkan' | 'Benar Salah';
   pertanyaan: string;
   opsi?: {
     a: string;
@@ -46,6 +48,7 @@ export interface Question {
     e?: string;
   };
   kunciJawaban: string;
+  matchingAnswer?: string;
   levelKognitif: 'L1' | 'L2' | 'L3';
   indikator: string;
   imagePrompt?: string;

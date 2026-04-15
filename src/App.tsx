@@ -33,6 +33,8 @@ export default function App() {
     jumlahPilihanGandaKompleks: 5,
     jumlahIsian: 5,
     jumlahUraian: 5,
+    jumlahMenjodohkan: 5,
+    jumlahBenarSalah: 5,
     persenL1: 30,
     persenL2: 40,
     persenL3: 30,

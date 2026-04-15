@@ -144,162 +144,248 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
             </div>
           </div>
 
-          {/* Pilihan Ganda */}
+          {/* Render Sections Dynamically */}
           {(() => {
-            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
-            if (pgSoal.length === 0) return null;
-            
-            const count = Number(mainInput.jumlahOpsiPG);
-            const optionsStr = count === 3 ? 'a, b, atau c' : count === 4 ? 'a, b, c, atau d' : 'a, b, c, d, atau e';
-            
-            return (
-              <div className="space-y-6">
-                <h5 className="font-bold border-b pb-1">
-                  I. Berilah tanda silang (x) pada huruf {optionsStr} di depan jawaban yang paling benar!
-                </h5>
-                {pgSoal.map((s, i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="flex space-x-2">
-                      <span className="font-bold">{s.no}.</span>
-                      <div className="flex-1">
-                        <p className="leading-relaxed">{s.pertanyaan}</p>
-                        {s.imagePrompt && (
-                          <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                            <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
-                            <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
-                          </div>
-                        )}
-                        {s.opsi && (
-                          <div className="flex flex-col gap-1 mt-2">
-                            <p>a. {s.opsi.a}</p>
-                            <p>b. {s.opsi.b}</p>
-                            {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
-                            {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
-                            {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
+            const sections = [
+              { tipe: 'Pilihan Ganda', label: (optionsStr: string) => `Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar!` },
+              { tipe: 'Pilihan Ganda Kompleks', label: (optionsStr: string) => `Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar (Pilih 2 jawaban yang benar)!` },
+              { tipe: 'Menjodohkan', label: () => `Pasangkanlah pernyataan di bawah ini dengan jawaban yang tepat!` },
+              { tipe: 'Benar Salah', label: () => `Berilah tanda centang (√) pada kolom Benar atau Salah!` },
+              { tipe: 'Isian', label: () => `Isilah titik-titik di bawah ini dengan jawaban yang tepat!` },
+              { tipe: 'Uraian', label: () => `Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!` }
+            ];
 
-          {/* Pilihan Ganda Kompleks */}
-          {(() => {
-            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
-            const pgkSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks');
-            if (pgkSoal.length === 0) return null;
-            
-            const sectionNum = pgSoal.length > 0 ? "II" : "I";
-            const count = Number(mainInput.jumlahOpsiPGK);
-            const optionsStr = count === 3 ? 'a, b, atau c' : count === 4 ? 'a, b, c, atau d' : 'a, b, c, d, atau e';
-            
-            return (
-              <div className="space-y-6 pt-8">
-                <h5 className="font-bold border-b pb-1">
-                  {sectionNum}. Berilah tanda silang (x) pada huruf {optionsStr} di depan jawaban yang paling benar (Pilih 2 jawaban yang benar)!
-                </h5>
-                {pgkSoal.map((s, i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="flex space-x-2">
-                      <span className="font-bold">{s.no}.</span>
-                      <div className="flex-1">
-                        <p className="leading-relaxed">{s.pertanyaan}</p>
-                        {s.imagePrompt && (
-                          <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                            <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
-                            <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
-                          </div>
-                        )}
-                        {s.opsi && (
-                          <div className="flex flex-col gap-1 mt-2">
-                            <p>a. {s.opsi.a}</p>
-                            <p>b. {s.opsi.b}</p>
-                            {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
-                            {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
-                            {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
+            const activeSections = sections.filter(sec => output.soal.some(s => s.tipe === sec.tipe));
+            const romanNumerals = ["I", "II", "III", "IV", "V", "VI"];
 
-          {/* Isian */}
-          {(() => {
-            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
-            const pgkSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks');
-            const isianSoal = output.soal.filter(s => s.tipe === 'Isian');
-            if (isianSoal.length === 0) return null;
-            
-            let sectionInt = 1;
-            if (pgSoal.length > 0) sectionInt++;
-            if (pgkSoal.length > 0) sectionInt++;
-            
-            const roman = ["I", "II", "III", "IV"][sectionInt - 1];
-            
-            return (
-              <div className="space-y-6 pt-8">
-                <h5 className="font-bold border-b pb-1">{roman}. Isilah titik-titik di bawah ini dengan jawaban yang tepat!</h5>
-                {isianSoal.map((s, i) => (
-                  <div key={i} className="flex space-x-2">
-                    <span className="font-bold">{s.no}.</span>
-                    <div className="flex-1">
-                      <p className="leading-relaxed">{s.pertanyaan}</p>
-                      {s.imagePrompt && (
-                        <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                          <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
-                          <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
+            return activeSections.map((sec, idx) => {
+              const soalList = output.soal.filter(s => s.tipe === sec.tipe);
+              const roman = romanNumerals[idx];
+
+              if (sec.tipe === 'Pilihan Ganda') {
+                const count = Number(mainInput.jumlahOpsiPG);
+                const optionsStr = count === 3 ? 'a, b, atau c' : count === 4 ? 'a, b, c, atau d' : 'a, b, c, d, atau e';
+                return (
+                  <div key={sec.tipe} className="space-y-6">
+                    <h5 className="font-bold border-b pb-1">
+                      {roman}. {sec.label(optionsStr)}
+                    </h5>
+                    {soalList.map((s, i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="flex space-x-2">
+                          <span className="font-bold">{s.no}.</span>
+                          <div className="flex-1">
+                            <p className="leading-relaxed">{s.pertanyaan}</p>
+                            {s.imagePrompt && (
+                              <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">
+                                <img 
+                                  src={`https://image.pollinations.ai/prompt/${encodeURIComponent(s.imagePrompt)}?width=800&height=800&nologo=true&seed=${s.no}`} 
+                                  alt={s.imagePrompt}
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                />
+                              </div>
+                            )}
+                            {s.opsi && (
+                              <div className="flex flex-col gap-1 mt-2">
+                                <p>a. {s.opsi.a}</p>
+                                <p>b. {s.opsi.b}</p>
+                                {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
+                                {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
+                                {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            );
-          })()}
+                );
+              }
 
-          {/* Uraian */}
-          {(() => {
-            const pgSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda');
-            const pgkSoal = output.soal.filter(s => s.tipe === 'Pilihan Ganda Kompleks');
-            const isianSoal = output.soal.filter(s => s.tipe === 'Isian');
-            const uraianSoal = output.soal.filter(s => s.tipe === 'Uraian');
-            if (uraianSoal.length === 0) return null;
-            
-            let sectionInt = 1;
-            if (pgSoal.length > 0) sectionInt++;
-            if (pgkSoal.length > 0) sectionInt++;
-            if (isianSoal.length > 0) sectionInt++;
-            
-            const roman = ["I", "II", "III", "IV"][sectionInt - 1];
-            
-            return (
-              <div className="space-y-6 pt-8">
-                <h5 className="font-bold border-b pb-1">
-                  {roman}. Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!
-                </h5>
-                {uraianSoal.map((s, i) => (
-                  <div key={i} className="flex space-x-2">
-                    <span className="font-bold">{s.no}.</span>
-                    <div className="flex-1">
-                      <p className="leading-relaxed">{s.pertanyaan}</p>
-                      {s.imagePrompt && (
-                        <div className="my-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                          <p className="text-xs text-gray-400 uppercase font-bold mb-2">Box Gambar</p>
-                          <p className="text-sm text-gray-600 italic">Prompt: {s.imagePrompt}</p>
+              if (sec.tipe === 'Pilihan Ganda Kompleks') {
+                const count = Number(mainInput.jumlahOpsiPGK);
+                const optionsStr = count === 3 ? 'a, b, atau c' : count === 4 ? 'a, b, c, atau d' : 'a, b, c, d, atau e';
+                return (
+                  <div key={sec.tipe} className="space-y-6 pt-8">
+                    <h5 className="font-bold border-b pb-1">
+                      {roman}. {sec.label(optionsStr)}
+                    </h5>
+                    {soalList.map((s, i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="flex space-x-2">
+                          <span className="font-bold">{s.no}.</span>
+                          <div className="flex-1">
+                            <p className="leading-relaxed">{s.pertanyaan}</p>
+                            {s.imagePrompt && (
+                              <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">
+                                <img 
+                                  src={`https://image.pollinations.ai/prompt/${encodeURIComponent(s.imagePrompt)}?width=800&height=800&nologo=true&seed=${s.no}`} 
+                                  alt={s.imagePrompt}
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                />
+                              </div>
+                            )}
+                            {s.opsi && (
+                              <div className="flex flex-col gap-1 mt-2">
+                                <p>a. {s.opsi.a}</p>
+                                <p>b. {s.opsi.b}</p>
+                                {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
+                                {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
+                                {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            );
+                );
+              }
+
+              if (sec.tipe === 'Menjodohkan') {
+                const answers = soalList.map(s => s.matchingAnswer || s.kunciJawaban).filter(Boolean);
+                const shuffledAnswers = [...answers].sort(() => Math.random() - 0.5);
+                return (
+                  <div key={sec.tipe} className="space-y-4 pt-8">
+                    <h5 className="font-bold border-b pb-1">{roman}. {sec.label("")}</h5>
+                    <table className="w-full border-collapse border border-black text-sm">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border border-black p-2 w-8">NO</th>
+                          <th className="border border-black p-2">PERNYATAAN</th>
+                          <th className="border border-black p-2 w-48">JAWABAN</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {soalList.map((s, i) => (
+                          <tr key={i}>
+                            <td className="border border-black p-2 text-center font-bold">{s.no}.</td>
+                            <td className="border border-black p-2">
+                              {s.pertanyaan}
+                              {s.imagePrompt && (
+                                <div className="mt-2 overflow-hidden rounded border border-gray-200 shadow-sm w-[6cm] h-[6cm]">
+                                  <img 
+                                    src={`https://image.pollinations.ai/prompt/${encodeURIComponent(s.imagePrompt)}?width=800&height=800&nologo=true&seed=${s.no}`} 
+                                    alt={s.imagePrompt}
+                                    className="w-full h-full object-cover"
+                                    referrerPolicy="no-referrer"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              )}
+                            </td>
+                            <td className="border border-black p-2">{shuffledAnswers[i] || ""}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              }
+
+              if (sec.tipe === 'Benar Salah') {
+                return (
+                  <div key={sec.tipe} className="space-y-4 pt-8">
+                    <h5 className="font-bold border-b pb-1">{roman}. {sec.label("")}</h5>
+                    <table className="w-full border-collapse border border-black text-sm">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border border-black p-2 w-8">NO</th>
+                          <th className="border border-black p-2">PERNYATAAN</th>
+                          <th className="border border-black p-2 w-20">BENAR</th>
+                          <th className="border border-black p-2 w-20">SALAH</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {soalList.map((s, i) => (
+                          <tr key={i}>
+                            <td className="border border-black p-2 text-center font-bold">{s.no}.</td>
+                            <td className="border border-black p-2">
+                              {s.pertanyaan}
+                              {s.imagePrompt && (
+                                <div className="mt-2 overflow-hidden rounded border border-gray-200 shadow-sm w-[6cm] h-[6cm]">
+                                  <img 
+                                    src={`https://image.pollinations.ai/prompt/${encodeURIComponent(s.imagePrompt)}?width=800&height=800&nologo=true&seed=${s.no}`} 
+                                    alt={s.imagePrompt}
+                                    className="w-full h-full object-cover"
+                                    referrerPolicy="no-referrer"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              )}
+                            </td>
+                            <td className="border border-black p-2"></td>
+                            <td className="border border-black p-2"></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              }
+
+              if (sec.tipe === 'Isian') {
+                return (
+                  <div key={sec.tipe} className="space-y-6 pt-8">
+                    <h5 className="font-bold border-b pb-1">{roman}. {sec.label("")}</h5>
+                    {soalList.map((s, i) => (
+                      <div key={i} className="flex space-x-2">
+                        <span className="font-bold">{s.no}.</span>
+                        <div className="flex-1">
+                          <p className="leading-relaxed">{s.pertanyaan}</p>
+                          {s.imagePrompt && (
+                            <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">
+                              <img 
+                                src={`https://image.pollinations.ai/prompt/${encodeURIComponent(s.imagePrompt)}?width=800&height=800&nologo=true&seed=${s.no}`} 
+                                alt={s.imagePrompt}
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              if (sec.tipe === 'Uraian') {
+                return (
+                  <div key={sec.tipe} className="space-y-6 pt-8">
+                    <h5 className="font-bold border-b pb-1">
+                      {roman}. {sec.label("")}
+                    </h5>
+                    {soalList.map((s, i) => (
+                      <div key={i} className="flex space-x-2">
+                        <span className="font-bold">{s.no}.</span>
+                        <div className="flex-1">
+                          <p className="leading-relaxed">{s.pertanyaan}</p>
+                          {s.imagePrompt && (
+                            <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">
+                              <img 
+                                src={`https://image.pollinations.ai/prompt/${encodeURIComponent(s.imagePrompt)}?width=800&height=800&nologo=true&seed=${s.no}`} 
+                                alt={s.imagePrompt}
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              return null;
+            });
           })()}
         </div>
       </section>

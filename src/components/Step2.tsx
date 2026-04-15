@@ -164,6 +164,30 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
                   min="0"
                 />
               </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-[#00796B] uppercase">Menjodohkan</label>
+                <input
+                  type="number"
+                  name="jumlahMenjodohkan"
+                  value={data.jumlahMenjodohkan}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] outline-none transition-all bg-white"
+                  min="0"
+                  max="10"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-[#00796B] uppercase">Benar Salah</label>
+                <input
+                  type="number"
+                  name="jumlahBenarSalah"
+                  value={data.jumlahBenarSalah}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] outline-none transition-all bg-white"
+                  min="0"
+                  max="10"
+                />
+              </div>
             </div>
           </div>
 

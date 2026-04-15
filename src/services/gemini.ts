@@ -23,7 +23,7 @@ export async function generateSoalAndKisiKisi(
     Content Details:
     - CP & Indikator Pairs:
       ${mainInput.cpTpPairs.map((p, i) => `Pair #${i + 1}:\n      CP: ${p.cp}\n      Indikator: ${p.tp}`).join('\n      ')}
-    - Question Counts: PG=${mainInput.jumlahPilihanGanda}, PG Kompleks=${mainInput.jumlahPilihanGandaKompleks}, Isian=${mainInput.jumlahIsian}, Uraian=${mainInput.jumlahUraian}
+    - Question Counts: PG=${mainInput.jumlahPilihanGanda}, PG Kompleks=${mainInput.jumlahPilihanGandaKompleks}, Isian=${mainInput.jumlahIsian}, Uraian=${mainInput.jumlahUraian}, Menjodohkan=${mainInput.jumlahMenjodohkan}, Benar Salah=${mainInput.jumlahBenarSalah}
     - Cognitive Levels: L1=${mainInput.persenL1}%, L2=${mainInput.persenL2}%, L3=${mainInput.persenL3}%
     - Image Percentage: ${mainInput.persenGambar}% of questions should have an imagePrompt.
     
@@ -41,11 +41,14 @@ export async function generateSoalAndKisiKisi(
       * If Exam Mode is HOTS: The stimulus in the question must be longer, providing more context or a short story (3-5 sentences).
     - Pilihan Ganda (PG): Provide exactly ${mainInput.jumlahOpsiPG} options.
     - Pilihan Ganda Kompleks (PGK): Questions where students can choose more than one correct answer. Provide exactly ${mainInput.jumlahOpsiPGK} options and ensure exactly 2 correct answers for each PGK question.
+    - Menjodohkan: Questions where students match items from two columns. For each Menjodohkan question, provide the statement in 'pertanyaan' and the corresponding correct matching item in 'matchingAnswer' and 'kunciJawaban'.
+    - Benar Salah: Questions where students choose between "Benar" or "Salah".
     - For Isian and Uraian, DO NOT provide any options (opsi).
     - Indicators must be derived from the provided Indikator field in the input, but enhanced with the stimulus pattern for HOTS.
     - Questions must be in Indonesian (Bahasa Indonesia).
     - For questions that might need an image, provide a descriptive 'imagePrompt'.
     - Ensure the number of questions matches the requested counts.
+    - IMPORTANT: The question numbers ('no') MUST be sequential across ALL types, starting from 1 for the first section and continuing through the last section (e.g., if PG is 1-10, PGK starts at 11).
     - Distribute cognitive levels according to the percentages.
   `;
 
@@ -93,6 +96,7 @@ export async function generateSoalAndKisiKisi(
                   }
                 },
                 kunciJawaban: { type: Type.STRING },
+                matchingAnswer: { type: Type.STRING },
                 levelKognitif: { type: Type.STRING },
                 indikator: { type: Type.STRING },
                 imagePrompt: { type: Type.STRING }
