@@ -9,6 +9,7 @@ export interface IdentityData {
   nipKepalaMadrasah: string;
   tahunPelajaran: string;
   semester: string;
+  jenisUjian: string;
   examType: ExamType;
   fase: Fase;
   kelas: string;

@@ -173,8 +173,8 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
                       </div>
                       <div className="flex-1 truncate">
                         <span className="text-[10px] font-bold block leading-tight">Bagian {idx + 1}</span>
-                        <span className="text-[8px] opacity-60 truncate block leading-tight">
-                          {pair.cp ? pair.cp.substring(0, 15) + '...' : '(Kosong)'}
+                        <span className={`text-[8px] truncate block leading-tight font-bold ${pair.cp && pair.tp ? 'text-green-400' : 'text-red-400'}`}>
+                          {pair.cp && pair.tp ? 'Sudah Terisi' : 'Belum Terisi'}
                         </span>
                       </div>
                       {pair.cp && pair.tp && (
@@ -417,25 +417,32 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
           </svg>
           <span>Kembali</span>
         </button>
-        <button
-          onClick={onGenerate}
-          disabled={!isComplete || isLoading}
-          className="px-12 py-4 bg-[#00897B] text-white font-bold rounded-2xl shadow-xl hover:bg-[#00695C] disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 flex items-center space-x-2"
-        >
-          {isLoading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Memproses Data...</span>
-            </>
-          ) : (
-            <>
-              <span>Generate Instrumen</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M11.3 1.047a1 1 0 01.897.487l1.174 2.14a1 1 0 00.708.519l2.447.448a1 1 0 01.554 1.706l-1.845 1.638a1 1 0 00-.313.963l.543 2.426a1 1 0 01-1.483 1.077L11.3 11.13a1 1 0 00-1.047 0l-2.553 1.32a1 1 0 01-1.483-1.077l.543-2.426a1 1 0 00-.313-.963L4.603 6.347a1 1 0 01.554-1.706l2.447-.448a1 1 0 00.708-.519l1.174-2.14a1 1 0 01.897-.487z" clipRule="evenodd" />
-              </svg>
-            </>
+        <div className="flex flex-col items-end space-y-2">
+          {!isComplete && (
+            <p className="text-[10px] text-red-500 font-bold animate-pulse">
+              * Semua bagian CP & Indikator wajib diisi!
+            </p>
           )}
-        </button>
+          <button
+            onClick={onGenerate}
+            disabled={!isComplete || isLoading}
+            className="px-12 py-4 bg-[#00897B] text-white font-bold rounded-2xl shadow-xl hover:bg-[#00695C] disabled:bg-gray-300 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 flex items-center space-x-2"
+          >
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Memproses Data...</span>
+              </>
+            ) : (
+              <>
+                <span>Generate Instrumen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M11.3 1.047a1 1 0 01.897.487l1.174 2.14a1 1 0 00.708.519l2.447.448a1 1 0 01.554 1.706l-1.845 1.638a1 1 0 00-.313.963l.543 2.426a1 1 0 01-1.483 1.077L11.3 11.13a1 1 0 00-1.047 0l-2.553 1.32a1 1 0 01-1.483-1.077l.543-2.426a1 1 0 00-.313-.963L4.603 6.347a1 1 0 01.554-1.706l2.447-.448a1 1 0 00.708-.519l1.174-2.14a1 1 0 01.897-.487z" clipRule="evenodd" />
+                </svg>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

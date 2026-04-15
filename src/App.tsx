@@ -21,6 +21,7 @@ export default function App() {
     nipKepalaMadrasah: '',
     tahunPelajaran: '2025/2026',
     semester: '2 (Genap)',
+    jenisUjian: 'ULANGAN HARIAN',
     examType: 'simple',
     fase: 'Fase A',
     kelas: 'Kelas 1',

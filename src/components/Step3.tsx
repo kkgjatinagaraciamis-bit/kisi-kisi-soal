@@ -55,16 +55,6 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
             </div>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
-            <h4 className="font-bold text-[#00695C] border-b pb-2">Capaian & Indikator</h4>
-            {mainInput.cpTpPairs.map((pair, index) => (
-              <div key={index} className="space-y-1 text-sm">
-                <p><span className="font-bold">CP #{index + 1}:</span> {pair.cp}</p>
-                <p><span className="font-bold">Indikator #{index + 1}:</span> {pair.tp}</p>
-              </div>
-            ))}
-          </div>
-
           <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-[#B2DFDB] text-sm">
               <thead>

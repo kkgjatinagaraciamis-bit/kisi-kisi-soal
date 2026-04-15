@@ -13,7 +13,7 @@ export const Step1: React.FC<Step1Props> = ({ data, onChange, onNext }) => {
     onChange({ ...data, [name]: value });
   };
 
-  const isComplete = data.namaSatuanPendidikan && data.namaGuru && data.namaKepalaMadrasah && data.tahunPelajaran && data.semester && data.fase && data.kelas && data.mataPelajaran;
+  const isComplete = data.namaSatuanPendidikan && data.namaGuru && data.namaKepalaMadrasah && data.tahunPelajaran && data.jenisUjian && data.mataPelajaran && (data.jenisUjian === 'UJIAN MADRASAH' || (data.fase && data.kelas && data.semester));
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto p-8 bg-white rounded-3xl shadow-2xl border border-[#B2DFDB]">
@@ -60,17 +60,34 @@ export const Step1: React.FC<Step1Props> = ({ data, onChange, onNext }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-[#00796B]">Semester</label>
+              <label className={`text-sm font-semibold ${data.jenisUjian === 'UJIAN MADRASAH' ? 'text-gray-400' : 'text-[#00796B]'}`}>Semester</label>
               <select
                 name="semester"
                 value={data.semester}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all bg-gray-50/50 focus:bg-white"
-                required
+                disabled={data.jenisUjian === 'UJIAN MADRASAH'}
+                className={`w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all ${data.jenisUjian === 'UJIAN MADRASAH' ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50/50 focus:bg-white'}`}
+                required={data.jenisUjian !== 'UJIAN MADRASAH'}
               >
                 <option value="">Pilih Semester</option>
                 <option value="1 (Ganjil)">1 (Ganjil)</option>
                 <option value="2 (Genap)">2 (Genap)</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-[#00796B]">Jenis Ujian</label>
+              <select
+                name="jenisUjian"
+                value={data.jenisUjian}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all bg-gray-50/50 focus:bg-white"
+                required
+              >
+                <option value="ULANGAN HARIAN">ULANGAN HARIAN</option>
+                <option value="ASSESMEN SUMATIF AKHIR SEMESTER ( ASAS )">ASSESMEN SUMATIF AKHIR SEMESTER ( ASAS )</option>
+                <option value="ASSESMEN SUMATIF AKHIR TAHUN ( ASAT )">ASSESMEN SUMATIF AKHIR TAHUN ( ASAT )</option>
+                <option value="UJIAN MADRASAH">UJIAN MADRASAH</option>
               </select>
             </div>
           </div>
@@ -143,13 +160,14 @@ export const Step1: React.FC<Step1Props> = ({ data, onChange, onNext }) => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-[#00796B]">Pilihan Fase</label>
+              <label className={`text-sm font-semibold ${data.jenisUjian === 'UJIAN MADRASAH' ? 'text-gray-400' : 'text-[#00796B]'}`}>Pilihan Fase</label>
               <select
                 name="fase"
                 value={data.fase}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all bg-gray-50/50 focus:bg-white"
-                required
+                disabled={data.jenisUjian === 'UJIAN MADRASAH'}
+                className={`w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all ${data.jenisUjian === 'UJIAN MADRASAH' ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50/50 focus:bg-white'}`}
+                required={data.jenisUjian !== 'UJIAN MADRASAH'}
               >
                 <option value="">Pilih Fase</option>
                 <option value="Fase A">Fase A</option>
@@ -159,13 +177,14 @@ export const Step1: React.FC<Step1Props> = ({ data, onChange, onNext }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-[#00796B]">Pilihan Kelas</label>
+              <label className={`text-sm font-semibold ${data.jenisUjian === 'UJIAN MADRASAH' ? 'text-gray-400' : 'text-[#00796B]'}`}>Pilihan Kelas</label>
               <select
                 name="kelas"
                 value={data.kelas}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all bg-gray-50/50 focus:bg-white"
-                required
+                disabled={data.jenisUjian === 'UJIAN MADRASAH'}
+                className={`w-full px-4 py-2.5 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all ${data.jenisUjian === 'UJIAN MADRASAH' ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-gray-50/50 focus:bg-white'}`}
+                required={data.jenisUjian !== 'UJIAN MADRASAH'}
               >
                 <option value="">Pilih Kelas</option>
                 <option value="Kelas 1">Kelas 1</option>

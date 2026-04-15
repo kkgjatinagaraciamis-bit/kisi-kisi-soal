@@ -14,6 +14,7 @@ export async function generateSoalAndKisiKisi(
     - School: ${identity.namaSatuanPendidikan}
     - Teacher: ${identity.namaGuru}
     - Subject: ${identity.mataPelajaran}
+    - Exam Type: ${identity.jenisUjian}
     - Phase: ${identity.fase}
     - Class: ${identity.kelas}
     - Semester: ${identity.semester}

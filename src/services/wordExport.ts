@@ -4,13 +4,13 @@ import { IdentityData, MainInputData, GeneratorOutput } from "../types";
 import { Buffer } from "buffer";
 
 export async function exportToWord(identity: IdentityData, mainInput: MainInputData, output: GeneratorOutput) {
-  const fetchImage = async (prompt: string): Promise<Buffer | null> => {
+  const fetchImage = async (prompt: string, seed: number): Promise<Uint8Array | null> => {
     try {
-      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=450&nologo=true&seed=${Math.floor(Math.random() * 1000000)}`;
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=800&nologo=true&seed=${seed}`;
       const response = await fetch(url);
       if (!response.ok) return null;
       const arrayBuffer = await response.arrayBuffer();
-      return Buffer.from(arrayBuffer);
+      return new Uint8Array(arrayBuffer);
     } catch (error) {
       console.error("Failed to fetch image:", error);
       return null;
@@ -75,31 +75,6 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
               }),
             ],
           }),
-
-          new Paragraph({ text: "", spacing: { after: 200 } }),
-
-          // CP & INDIKATOR SUMMARY
-          new Paragraph({
-            children: [
-              new TextRun({ text: "CAPAIAN & INDIKATOR", bold: true, size: 24 }),
-            ],
-            spacing: { before: 200, after: 100 },
-          }),
-          ...mainInput.cpTpPairs.map((pair, index) => [
-            new Paragraph({
-              children: [
-                new TextRun({ text: `CP #${index + 1}: `, bold: true }),
-                new TextRun(pair.cp),
-              ],
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({ text: `Indikator #${index + 1}: `, bold: true }),
-                new TextRun(pair.tp),
-              ],
-              spacing: { after: 100 },
-            }),
-          ]).flat(),
 
           new Paragraph({ text: "", spacing: { after: 200 } }),
 
@@ -215,16 +190,17 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                 const contentChildren: any[] = [new Paragraph({ text: s.pertanyaan })];
                 
                 if (s.imagePrompt) {
-                  const imageBuffer = await fetchImage(s.imagePrompt);
+                  const imageBuffer = await fetchImage(s.imagePrompt, s.no);
                   if (imageBuffer) {
                     contentChildren.push(new Paragraph({
                       children: [
                         new ImageRun({
                           data: imageBuffer,
-                          transformation: { width: 227, height: 227 },
+                          transformation: { width: 250, height: 250 },
                         } as any),
                       ],
                       spacing: { before: 200, after: 200 },
+                      alignment: AlignmentType.CENTER,
                     }));
                   }
                 }
@@ -295,16 +271,17 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   }));
 
                   if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt);
+                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
                     if (imageBuffer) {
                       result.push(new Paragraph({
                         children: [
                           new ImageRun({
                             data: imageBuffer,
-                            transformation: { width: 227, height: 227 },
+                            transformation: { width: 250, height: 250 },
                           } as any),
                         ],
                         spacing: { before: 200, after: 200 },
+                        alignment: AlignmentType.CENTER,
                       }));
                     }
                   }
@@ -333,16 +310,17 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   }));
 
                   if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt);
+                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
                     if (imageBuffer) {
                       result.push(new Paragraph({
                         children: [
                           new ImageRun({
                             data: imageBuffer,
-                            transformation: { width: 227, height: 227 },
+                            transformation: { width: 250, height: 250 },
                           } as any),
                         ],
                         spacing: { before: 200, after: 200 },
+                        alignment: AlignmentType.CENTER,
                       }));
                     }
                   }
@@ -384,16 +362,17 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                     spacing: { before: 200 },
                   }));
                   if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt);
+                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
                     if (imageBuffer) {
                       result.push(new Paragraph({
                         children: [
                           new ImageRun({
                             data: imageBuffer,
-                            transformation: { width: 227, height: 227 },
+                            transformation: { width: 250, height: 250 },
                           } as any),
                         ],
                         spacing: { before: 200, after: 200 },
+                        alignment: AlignmentType.CENTER,
                       }));
                     }
                   }
@@ -411,16 +390,17 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                     spacing: { before: 200 },
                   }));
                   if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt);
+                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
                     if (imageBuffer) {
                       result.push(new Paragraph({
                         children: [
                           new ImageRun({
                             data: imageBuffer,
-                            transformation: { width: 227, height: 227 },
+                            transformation: { width: 250, height: 250 },
                           } as any),
                         ],
                         spacing: { before: 200, after: 200 },
+                        alignment: AlignmentType.CENTER,
                       }));
                     }
                   }
