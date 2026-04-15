@@ -1,5 +1,7 @@
 import React from 'react';
 import { MainInputData, ExamType } from '../types';
+import { motion, AnimatePresence } from 'motion/react';
+import { Plus, Trash2, Target, Lightbulb, Info } from 'lucide-react';
 
 interface Step2Props {
   data: MainInputData;
@@ -11,6 +13,8 @@ interface Step2Props {
 }
 
 export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, onGenerate, isLoading }) => {
+  const [activeIndex, setActiveIndex] = React.useState(0);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     let val: any = value;
@@ -27,13 +31,18 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
   };
 
   const addCPTPPair = () => {
-    onChange({ ...data, cpTpPairs: [...data.cpTpPairs, { cp: '', tp: '' }] });
+    const newPairs = [...data.cpTpPairs, { cp: '', tp: '' }];
+    onChange({ ...data, cpTpPairs: newPairs });
+    setActiveIndex(newPairs.length - 1);
   };
 
   const removeCPTPPair = (index: number) => {
     if (data.cpTpPairs.length > 1) {
       const newPairs = data.cpTpPairs.filter((_, i) => i !== index);
       onChange({ ...data, cpTpPairs: newPairs });
+      if (activeIndex >= newPairs.length) {
+        setActiveIndex(newPairs.length - 1);
+      }
     }
   };
 
@@ -59,55 +68,140 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
             <button
               type="button"
               onClick={addCPTPPair}
-              className="px-4 py-2 bg-[#00897B] text-white text-xs font-bold rounded-xl hover:bg-[#00695C] transition-all shadow-md flex items-center space-x-1"
+              className="px-6 py-3 bg-[#00897B] text-white text-sm font-bold rounded-2xl hover:bg-[#00695C] hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center space-x-2"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-              <span>Tambah CP/Indikator</span>
+              <Plus className="w-5 h-5" />
+              <span>Tambah CP & Indikator</span>
             </button>
           </div>
 
-          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-            {data.cpTpPairs.map((pair, index) => (
-              <div key={index} className="p-6 bg-gray-50 rounded-2xl border border-[#B2DFDB] space-y-4 relative group hover:border-[#4DB6AC] transition-all">
-                {data.cpTpPairs.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeCPTPPair(index)}
-                    className="absolute top-4 right-4 text-red-400 hover:text-red-600 transition-colors"
-                    title="Hapus Pasangan"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                )}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-[#00796B] uppercase tracking-wide">Capaian Pembelajaran (CP) #{index + 1}</label>
-                  <textarea
-                    value={pair.cp}
-                    onChange={(e) => handleCPTPChange(index, 'cp', e.target.value)}
-                    rows={3}
-                    placeholder="Masukkan CP..."
-                    className="w-full px-4 py-3 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all resize-none bg-white"
-                    required
-                  />
-                </div>
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Input Area */}
+            <div className="flex-1">
+              <AnimatePresence mode="wait">
+                {data.cpTpPairs.map((pair, index) => (
+                  index === activeIndex && (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20, transition: { duration: 0.2 } }}
+                      className="p-8 bg-white rounded-3xl border-2 border-[#E0F2F1] space-y-6 shadow-sm"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-[#00897B] text-white rounded-xl flex items-center justify-center font-black shadow-lg">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-[#00695C]">Bagian Input #{index + 1}</h4>
+                            <p className="text-[10px] text-gray-400">Silakan lengkapi CP dan Indikator di bawah ini</p>
+                          </div>
+                        </div>
+                        {data.cpTpPairs.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeCPTPPair(index)}
+                            className="flex items-center space-x-1 px-4 py-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors text-xs font-bold border border-transparent hover:border-red-100"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Hapus Bagian Ini</span>
+                          </button>
+                        )}
+                      </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-[#00796B] uppercase tracking-wide">Indikator #{index + 1}</label>
-                  <textarea
-                    value={pair.tp}
-                    onChange={(e) => handleCPTPChange(index, 'tp', e.target.value)}
-                    rows={3}
-                    placeholder="Masukkan Indikator..."
-                    className="w-full px-4 py-3 rounded-xl border border-[#B2DFDB] focus:ring-2 focus:ring-[#4DB6AC] focus:border-transparent outline-none transition-all resize-none bg-white"
-                    required
-                  />
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <div className="p-1.5 bg-[#E0F2F1] rounded-lg">
+                              <Target className="w-4 h-4 text-[#00796B]" />
+                            </div>
+                            <label className="text-sm font-bold text-gray-700">Capaian Pembelajaran (CP)</label>
+                          </div>
+                          <textarea
+                            value={pair.cp}
+                            onChange={(e) => handleCPTPChange(index, 'cp', e.target.value)}
+                            rows={5}
+                            placeholder="Contoh: Peserta didik mampu mengenal huruf hijaiyah..."
+                            className="w-full px-5 py-4 rounded-2xl border-2 border-[#E0F2F1] focus:border-[#4DB6AC] outline-none transition-all resize-none bg-gray-50/30 text-sm leading-relaxed shadow-inner"
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <div className="p-1.5 bg-[#FFF3E0] rounded-lg">
+                              <Lightbulb className="w-4 h-4 text-[#EF6C00]" />
+                            </div>
+                            <label className="text-sm font-bold text-gray-700">Indikator / Tujuan (TP)</label>
+                          </div>
+                          <textarea
+                            value={pair.tp}
+                            onChange={(e) => handleCPTPChange(index, 'tp', e.target.value)}
+                            rows={5}
+                            placeholder="Contoh: Menyebutkan 5 huruf hijaiyah pertama dengan benar..."
+                            className="w-full px-5 py-4 rounded-2xl border-2 border-[#FFF3E0] focus:border-[#FFB74D] outline-none transition-all resize-none bg-gray-50/30 text-sm leading-relaxed shadow-inner"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Sidebar Navigation */}
+            <div className="w-full md:w-64 space-y-3">
+              <div className="p-4 bg-[#F5FBFB] rounded-2xl border border-[#B2DFDB] space-y-4">
+                <h4 className="text-[10px] font-black text-[#00796B] uppercase tracking-widest px-2">Daftar Bagian</h4>
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                  {data.cpTpPairs.map((pair, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveIndex(idx)}
+                      className={`w-full flex items-center space-x-2 p-1.5 rounded-lg transition-all text-left border-2 ${
+                        activeIndex === idx
+                          ? 'bg-[#00897B] border-[#00897B] text-white shadow-sm transform scale-[1.01]'
+                          : 'bg-white border-transparent text-gray-500 hover:border-[#B2DFDB] hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold shrink-0 ${
+                        activeIndex === idx ? 'bg-white/20' : 'bg-gray-100'
+                      }`}>
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 truncate">
+                        <span className="text-[10px] font-bold block leading-tight">Bagian {idx + 1}</span>
+                        <span className="text-[8px] opacity-60 truncate block leading-tight">
+                          {pair.cp ? pair.cp.substring(0, 15) + '...' : '(Kosong)'}
+                        </span>
+                      </div>
+                      {pair.cp && pair.tp && (
+                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full shrink-0"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={addCPTPPair}
+                  className="w-full py-2 bg-white border-2 border-dashed border-[#00897B] text-[#00897B] text-[10px] font-bold rounded-lg hover:bg-[#E0F2F1] transition-all flex items-center justify-center space-x-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Tambah Baru</span>
+                </button>
+              </div>
+              
+              <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                <div className="flex items-start space-x-2">
+                  <Info className="w-4 h-4 text-blue-500 mt-0.5" />
+                  <p className="text-[10px] text-blue-700 leading-tight">
+                    Gunakan sidebar ini untuk berpindah antar Capaian Pembelajaran dengan cepat.
+                  </p>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
 

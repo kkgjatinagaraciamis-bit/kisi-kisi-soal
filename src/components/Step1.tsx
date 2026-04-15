@@ -199,6 +199,7 @@ export const Step1: React.FC<Step1Props> = ({ data, onChange, onNext }) => {
                 <option value="PJOK">PJOK</option>
                 <option value="Seni dan Budaya">Seni dan Budaya</option>
                 <option value="Bahasa Inggris">Bahasa Inggris</option>
+                <option value="Bahasa Sunda">Bahasa Sunda</option>
                 <option value="Koding dan KA">Koding dan KA</option>
                 <option value="Bahasa Daerah">Bahasa Daerah</option>
                 <option value="Mulok">Mulok</option>

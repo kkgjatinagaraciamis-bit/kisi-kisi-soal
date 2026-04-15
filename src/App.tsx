@@ -38,7 +38,7 @@ export default function App() {
     persenL1: 30,
     persenL2: 40,
     persenL3: 30,
-    persenGambar: 20,
+    persenGambar: 5,
     jumlahOpsiPG: 4,
     jumlahOpsiPGK: 5,
   });

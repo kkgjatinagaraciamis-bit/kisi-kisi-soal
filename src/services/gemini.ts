@@ -45,7 +45,7 @@ export async function generateSoalAndKisiKisi(
     - Benar Salah: Questions where students choose between "Benar" or "Salah".
     - For Isian and Uraian, DO NOT provide any options (opsi).
     - Indicators must be derived from the provided Indikator field in the input, but enhanced with the stimulus pattern for HOTS.
-    - Questions must be in Indonesian (Bahasa Indonesia).
+    - The entire content (kisi-kisi, questions, and answer key) must be in ${identity.mataPelajaran === 'Bahasa Sunda' ? 'Sundanese (Bahasa Sunda)' : 'Indonesian (Bahasa Indonesia)'}.
     - For questions that might need an image, provide a descriptive 'imagePrompt'.
     - Ensure the number of questions matches the requested counts.
     - IMPORTANT: The question numbers ('no') MUST be sequential across ALL types, starting from 1 for the first section and continuing through the last section (e.g., if PG is 1-10, PGK starts at 11).
