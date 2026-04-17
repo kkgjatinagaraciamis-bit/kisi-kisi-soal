@@ -23,7 +23,7 @@ export async function generateSoalAndKisiKisi(
     
     Content Details:
     - CP & Indikator Pairs:
-      ${mainInput.cpTpPairs.map((p, i) => `Pair #${i + 1}:\n      CP: ${p.cp}\n      Indikator: ${p.tp}`).join('\n      ')}
+      ${mainInput.cpTpPairs.map((p, i) => `Pair #${i + 1}:\n      CP: ${p.cp}\n      Indikator: ${p.tp}${p.fase ? `\n      Phase (Fase): ${p.fase}` : ''}`).join('\n      ')}
     - Question Counts: PG=${mainInput.jumlahPilihanGanda}, PG Kompleks=${mainInput.jumlahPilihanGandaKompleks}, Isian=${mainInput.jumlahIsian}, Uraian=${mainInput.jumlahUraian}, Menjodohkan=${mainInput.jumlahMenjodohkan}, Benar Salah=${mainInput.jumlahBenarSalah}
     - Cognitive Levels: L1=${mainInput.persenL1}%, L2=${mainInput.persenL2}%, L3=${mainInput.persenL3}%
     - Image Percentage: ${mainInput.persenGambar}% of questions should have an imagePrompt.
@@ -32,6 +32,7 @@ export async function generateSoalAndKisiKisi(
     - L1 = C1, C2 (Remembering, Understanding)
     - L2 = C3, C4 (Applying, Analyzing)
     - L3 = C5, C6 (Evaluating, Creating)
+    - IMPORTANT: For UJIAN MADRASAH, use the specific 'Phase (Fase)' provided for each CP/TP pair in the Kisi-kisi grid. If not provided, use the global Phase: ${identity.fase}.
     - HOTS Mode Requirements:
       * Focus heavily on L2 and L3 levels.
       * Indicators in Kisi-kisi MUST follow the pattern: [Stimulus] + Murid + [Indikator] + [Keterangan].
@@ -46,7 +47,9 @@ export async function generateSoalAndKisiKisi(
     - Benar Salah: Questions where students choose between "Benar" or "Salah".
     - For Isian and Uraian, DO NOT provide any options (opsi).
     - Indicators must be derived from the provided Indikator field in the input, but enhanced with the stimulus pattern for HOTS.
-    - The entire content (kisi-kisi, questions, and answer key) must be in ${identity.mataPelajaran === 'Bahasa Sunda' ? 'Sundanese (Bahasa Sunda)' : 'Indonesian (Bahasa Indonesia)'}.
+    - The entire content (kisi-kisi, questions, and answer key) must be in:
+      * ${identity.mataPelajaran === 'Bahasa Sunda' ? 'Sundanese (Bahasa Sunda)' : identity.mataPelajaran === 'Bahasa Arab' ? 'Arabic (Bahasa Arab) using proper Arabic script (with harakat if appropriate for MI level)' : 'Indonesian (Bahasa Indonesia)'}.
+    - For Bahasa Arab: The 'pertanyaan' and 'opsi' MUST be in Arabic script. The 'indikator' and 'materi' in Kisi-kisi can be in Indonesian but the 'pertanyaan' in the Soal section MUST be Arabic.
     - For questions that might need an image, provide a descriptive 'imagePrompt'.
     - Ensure the number of questions matches the requested counts.
     - IMPORTANT: The question numbers ('no') MUST be sequential across ALL types, starting from 1 for the first section and continuing through the last section (e.g., if PG is 1-10, PGK starts at 11).

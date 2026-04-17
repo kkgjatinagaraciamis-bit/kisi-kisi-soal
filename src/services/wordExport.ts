@@ -4,6 +4,7 @@ import { IdentityData, MainInputData, GeneratorOutput } from "../types";
 import { Buffer } from "buffer";
 
 export async function exportToWord(identity: IdentityData, mainInput: MainInputData, output: GeneratorOutput) {
+  const isArabic = identity.mataPelajaran === 'Bahasa Arab';
   const fetchImage = async (prompt: string, seed: number): Promise<Uint8Array | null> => {
     try {
       const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=800&nologo=true&seed=${seed}`;
@@ -195,7 +196,13 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
               for (let idx = 0; idx < questions.length; idx++) {
                 const s = questions[idx];
-                const contentChildren: any[] = [new Paragraph({ text: s.pertanyaan })];
+                const contentChildren: any[] = [
+                  new Paragraph({ 
+                    children: [new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })],
+                    bidirectional: isArabic,
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                  })
+                ];
                 
                 if (s.imagePrompt) {
                   const imageBuffer = await fetchImage(s.imagePrompt, s.no);
@@ -215,11 +222,24 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
                 if (type === "PG" || type === "PGK") {
                   if (s.opsi) {
-                    contentChildren.push(new Paragraph({ text: `a. ${s.opsi.a}` }));
-                    contentChildren.push(new Paragraph({ text: `b. ${s.opsi.b}` }));
-                    if (s.opsi.c) contentChildren.push(new Paragraph({ text: `c. ${s.opsi.c}` }));
-                    if (s.opsi.d) contentChildren.push(new Paragraph({ text: `d. ${s.opsi.d}` }));
-                    if (s.opsi.e) contentChildren.push(new Paragraph({ text: `e. ${s.opsi.e}` }));
+                    const options = [
+                      { key: 'a', label: isArabic ? 'أ' : 'a' },
+                      { key: 'b', label: isArabic ? 'ب' : 'b' },
+                      { key: 'c', label: isArabic ? 'ج' : 'c' },
+                      { key: 'd', label: isArabic ? 'د' : 'd' },
+                      { key: 'e', label: isArabic ? 'هـ' : 'e' }
+                    ];
+
+                    for (const opt of options) {
+                      const val = (s.opsi as any)[opt.key];
+                      if (val) {
+                        contentChildren.push(new Paragraph({ 
+                          children: [new TextRun({ text: isArabic ? `${val} .${opt.label}` : `${opt.label}. ${val}`, font: isArabic ? "Traditional Arabic" : undefined })],
+                          bidirectional: isArabic,
+                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                        }));
+                      }
+                    }
                   }
                 }
 
@@ -234,7 +254,15 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                     if (type === "Menjodohkan" && h === "JAWABAN" && shuffledAnswers) {
                       cellText = shuffledAnswers[idx] || "";
                     }
-                    rowChildren.push(new TableCell({ children: [new Paragraph(cellText)] }));
+                    rowChildren.push(new TableCell({ 
+                      children: [
+                        new Paragraph({ 
+                          children: [new TextRun({ text: cellText, font: isArabic ? "Traditional Arabic" : undefined })],
+                          bidirectional: isArabic,
+                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                        })
+                      ] 
+                    }));
                   });
                 }
 
@@ -274,8 +302,13 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                 }));
                 for (const s of soalList) {
                   result.push(new Paragraph({
-                    children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                    children: [
+                      new TextRun({ text: `${s.no}. `, bold: true }), 
+                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
+                    ],
                     spacing: { before: 200 },
+                    bidirectional: isArabic,
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                   }));
 
                   if (s.imagePrompt) {
@@ -295,11 +328,24 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   }
 
                   if (s.opsi) {
-                    result.push(new Paragraph({ text: `a. ${s.opsi.a}` }));
-                    result.push(new Paragraph({ text: `b. ${s.opsi.b}` }));
-                    if (s.opsi.c) result.push(new Paragraph({ text: `c. ${s.opsi.c}` }));
-                    if (s.opsi.d) result.push(new Paragraph({ text: `d. ${s.opsi.d}` }));
-                    if (s.opsi.e) result.push(new Paragraph({ text: `e. ${s.opsi.e}` }));
+                    const options = [
+                      { key: 'a', label: isArabic ? 'أ' : 'a' },
+                      { key: 'b', label: isArabic ? 'ب' : 'b' },
+                      { key: 'c', label: isArabic ? 'ج' : 'c' },
+                      { key: 'd', label: isArabic ? 'د' : 'd' },
+                      { key: 'e', label: isArabic ? 'هـ' : 'e' }
+                    ];
+
+                    for (const opt of options) {
+                      const val = (s.opsi as any)[opt.key];
+                      if (val) {
+                        result.push(new Paragraph({ 
+                          children: [new TextRun({ text: isArabic ? `${val} .${opt.label}` : `${opt.label}. ${val}`, font: isArabic ? "Traditional Arabic" : undefined })],
+                          bidirectional: isArabic,
+                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                        }));
+                      }
+                    }
                   }
                 }
               } else if (sec.tipe === 'Pilihan Ganda Kompleks') {
@@ -313,8 +359,13 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
                 for (const s of soalList) {
                   result.push(new Paragraph({
-                    children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                    children: [
+                      new TextRun({ text: `${s.no}. `, bold: true }), 
+                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
+                    ],
                     spacing: { before: 200 },
+                    bidirectional: isArabic,
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                   }));
 
                   if (s.imagePrompt) {
@@ -334,11 +385,24 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   }
 
                   if (s.opsi) {
-                    result.push(new Paragraph({ text: `a. ${s.opsi.a}` }));
-                    result.push(new Paragraph({ text: `b. ${s.opsi.b}` }));
-                    if (s.opsi.c) result.push(new Paragraph({ text: `c. ${s.opsi.c}` }));
-                    if (s.opsi.d) result.push(new Paragraph({ text: `d. ${s.opsi.d}` }));
-                    if (s.opsi.e) result.push(new Paragraph({ text: `e. ${s.opsi.e}` }));
+                    const options = [
+                      { key: 'a', label: isArabic ? 'أ' : 'a' },
+                      { key: 'b', label: isArabic ? 'ب' : 'b' },
+                      { key: 'c', label: isArabic ? 'ج' : 'c' },
+                      { key: 'd', label: isArabic ? 'د' : 'd' },
+                      { key: 'e', label: isArabic ? 'هـ' : 'e' }
+                    ];
+
+                    for (const opt of options) {
+                      const val = (s.opsi as any)[opt.key];
+                      if (val) {
+                        result.push(new Paragraph({ 
+                          children: [new TextRun({ text: isArabic ? `${val} .${opt.label}` : `${opt.label}. ${val}`, font: isArabic ? "Traditional Arabic" : undefined })],
+                          bidirectional: isArabic,
+                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                        }));
+                      }
+                    }
                   }
                 }
               } else if (sec.tipe === 'Menjodohkan') {
@@ -366,8 +430,13 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
                 for (const s of soalList) {
                   result.push(new Paragraph({
-                    children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                    children: [
+                      new TextRun({ text: `${s.no}. `, bold: true }), 
+                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
+                    ],
                     spacing: { before: 200 },
+                    bidirectional: isArabic,
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                   }));
                   if (s.imagePrompt) {
                     const imageBuffer = await fetchImage(s.imagePrompt, s.no);
@@ -394,8 +463,13 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
                 for (const s of soalList) {
                   result.push(new Paragraph({
-                    children: [new TextRun({ text: `${s.no}. `, bold: true }), new TextRun(s.pertanyaan)],
+                    children: [
+                      new TextRun({ text: `${s.no}. `, bold: true }), 
+                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
+                    ],
                     spacing: { before: 200 },
+                    bidirectional: isArabic,
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                   }));
                   if (s.imagePrompt) {
                     const imageBuffer = await fetchImage(s.imagePrompt, s.no);

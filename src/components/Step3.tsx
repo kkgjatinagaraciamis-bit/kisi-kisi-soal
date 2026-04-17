@@ -11,8 +11,10 @@ interface Step3Props {
 }
 
 export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBack, onDownload }) => {
+  const isArabic = identity.mataPelajaran === 'Bahasa Arab';
+
   return (
-    <div className="space-y-12 max-w-[1400px] mx-auto p-6 pb-24">
+    <div className={`space-y-12 max-w-[1400px] mx-auto p-6 pb-24 ${isArabic ? 'font-arabic' : ''}`}>
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-lg border border-[#B2DFDB]">
         <div>
           <h2 className="text-2xl font-bold text-[#00695C]">Hasil Generate</h2>
@@ -172,7 +174,7 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                       <div key={i} className="space-y-2">
                         <div className="flex space-x-2">
                           <span className="font-bold">{s.no}.</span>
-                          <div className="flex-1">
+                          <div className={`flex-1 ${isArabic ? 'text-right' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>
                             <p className="leading-relaxed">{s.pertanyaan}</p>
                             {s.imagePrompt && (
                               <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">
@@ -186,12 +188,12 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                               </div>
                             )}
                             {s.opsi && (
-                              <div className="flex flex-col gap-1 mt-2">
-                                <p>a. {s.opsi.a}</p>
-                                <p>b. {s.opsi.b}</p>
-                                {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
-                                {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
-                                {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
+                              <div className={`flex flex-col gap-1 mt-2 ${isArabic ? 'items-end' : ''}`}>
+                                <p>{isArabic ? `${s.opsi.a} .أ` : `a. ${s.opsi.a}`}</p>
+                                <p>{isArabic ? `${s.opsi.b} .ب` : `b. ${s.opsi.b}`}</p>
+                                {count >= 3 && s.opsi.c && <p>{isArabic ? `${s.opsi.c} .ج` : `c. ${s.opsi.c}`}</p>}
+                                {count >= 4 && s.opsi.d && <p>{isArabic ? `${s.opsi.d} .د` : `d. ${s.opsi.d}`}</p>}
+                                {count >= 5 && s.opsi.e && <p>{isArabic ? `${s.opsi.e} .هـ` : `e. ${s.opsi.e}`}</p>}
                               </div>
                             )}
                           </div>
@@ -214,7 +216,7 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                       <div key={i} className="space-y-2">
                         <div className="flex space-x-2">
                           <span className="font-bold">{s.no}.</span>
-                          <div className="flex-1">
+                          <div className={`flex-1 ${isArabic ? 'text-right' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>
                             <p className="leading-relaxed">{s.pertanyaan}</p>
                             {s.imagePrompt && (
                               <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">
@@ -228,12 +230,12 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                               </div>
                             )}
                             {s.opsi && (
-                              <div className="flex flex-col gap-1 mt-2">
-                                <p>a. {s.opsi.a}</p>
-                                <p>b. {s.opsi.b}</p>
-                                {count >= 3 && s.opsi.c && <p>c. {s.opsi.c}</p>}
-                                {count >= 4 && s.opsi.d && <p>d. {s.opsi.d}</p>}
-                                {count >= 5 && s.opsi.e && <p>e. {s.opsi.e}</p>}
+                              <div className={`flex flex-col gap-1 mt-2 ${isArabic ? 'items-end' : ''}`}>
+                                <p>{isArabic ? `${s.opsi.a} .أ` : `a. ${s.opsi.a}`}</p>
+                                <p>{isArabic ? `${s.opsi.b} .ب` : `b. ${s.opsi.b}`}</p>
+                                {count >= 3 && s.opsi.c && <p>{isArabic ? `${s.opsi.c} .ج` : `c. ${s.opsi.c}`}</p>}
+                                {count >= 4 && s.opsi.d && <p>{isArabic ? `${s.opsi.d} .د` : `d. ${s.opsi.d}`}</p>}
+                                {count >= 5 && s.opsi.e && <p>{isArabic ? `${s.opsi.e} .هـ` : `e. ${s.opsi.e}`}</p>}
                               </div>
                             )}
                           </div>
@@ -262,7 +264,7 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                         {soalList.map((s, i) => (
                           <tr key={i}>
                             <td className="border border-black p-2 text-center font-bold">{s.no}.</td>
-                            <td className="border border-black p-2">
+                            <td className={`border border-black p-2 ${isArabic ? 'text-right' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>
                               {s.pertanyaan}
                               {s.imagePrompt && (
                                 <div className="mt-2 overflow-hidden rounded border border-gray-200 shadow-sm w-[6cm] h-[6cm]">
@@ -276,7 +278,7 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                                 </div>
                               )}
                             </td>
-                            <td className="border border-black p-2">{shuffledAnswers[i] || ""}</td>
+                            <td className={`border border-black p-2 ${isArabic ? 'text-right' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>{shuffledAnswers[i] || ""}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -302,7 +304,7 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                         {soalList.map((s, i) => (
                           <tr key={i}>
                             <td className="border border-black p-2 text-center font-bold">{s.no}.</td>
-                            <td className="border border-black p-2">
+                            <td className={`border border-black p-2 ${isArabic ? 'text-right' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>
                               {s.pertanyaan}
                               {s.imagePrompt && (
                                 <div className="mt-2 overflow-hidden rounded border border-gray-200 shadow-sm w-[6cm] h-[6cm]">
@@ -333,7 +335,7 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                     {soalList.map((s, i) => (
                       <div key={i} className="flex space-x-2">
                         <span className="font-bold">{s.no}.</span>
-                        <div className="flex-1">
+                        <div className={`flex-1 ${isArabic ? 'text-right' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>
                           <p className="leading-relaxed">{s.pertanyaan}</p>
                           {s.imagePrompt && (
                             <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">
@@ -362,7 +364,7 @@ export const Step3: React.FC<Step3Props> = ({ identity, mainInput, output, onBac
                     {soalList.map((s, i) => (
                       <div key={i} className="flex space-x-2">
                         <span className="font-bold">{s.no}.</span>
-                        <div className="flex-1">
+                        <div className={`flex-1 ${isArabic ? 'text-right' : ''}`} dir={isArabic ? 'rtl' : 'ltr'}>
                           <p className="leading-relaxed">{s.pertanyaan}</p>
                           {s.imagePrompt && (
                             <div className="my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm w-[6cm] h-[6cm]">

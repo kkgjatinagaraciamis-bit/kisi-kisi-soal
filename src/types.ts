@@ -1,4 +1,4 @@
-export type Fase = 'A' | 'B' | 'C';
+export type Fase = 'Fase A' | 'Fase B' | 'Fase C';
 export type ExamType = 'simple' | 'hots';
 
 export interface IdentityData {
@@ -19,6 +19,7 @@ export interface IdentityData {
 export interface CPTPPair {
   cp: string;
   tp: string;
+  fase?: string;
 }
 
 export interface MainInputData {

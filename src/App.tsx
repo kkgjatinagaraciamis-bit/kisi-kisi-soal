@@ -114,6 +114,7 @@ export default function App() {
                 <Step2 
                   data={mainInput} 
                   examType={identity.examType}
+                  jenisUjian={identity.jenisUjian}
                   onChange={setMainInput} 
                   onBack={() => setStep(1)}
                   onGenerate={handleGenerate}

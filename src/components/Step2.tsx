@@ -6,13 +6,14 @@ import { Plus, Trash2, Target, Lightbulb, Info } from 'lucide-react';
 interface Step2Props {
   data: MainInputData;
   examType: ExamType;
+  jenisUjian: string;
   onChange: (data: MainInputData) => void;
   onBack: () => void;
   onGenerate: () => void;
   isLoading: boolean;
 }
 
-export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, onGenerate, isLoading }) => {
+export const Step2: React.FC<Step2Props> = ({ data, examType, jenisUjian, onChange, onBack, onGenerate, isLoading }) => {
   const [activeIndex, setActiveIndex] = React.useState(0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -24,14 +25,14 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
     onChange({ ...data, [name]: val });
   };
 
-  const handleCPTPChange = (index: number, field: 'cp' | 'tp', value: string) => {
+  const handleCPTPChange = (index: number, field: 'cp' | 'tp' | 'fase', value: string) => {
     const newPairs = [...data.cpTpPairs];
     newPairs[index][field] = value;
     onChange({ ...data, cpTpPairs: newPairs });
   };
 
   const addCPTPPair = () => {
-    const newPairs = [...data.cpTpPairs, { cp: '', tp: '' }];
+    const newPairs = [...data.cpTpPairs, { cp: '', tp: '', fase: jenisUjian === 'UJIAN MADRASAH' ? 'Fase A' : undefined }];
     onChange({ ...data, cpTpPairs: newPairs });
     setActiveIndex(newPairs.length - 1);
   };
@@ -46,7 +47,7 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
     }
   };
 
-  const isComplete = data.cpTpPairs.every(p => p.cp && p.tp);
+  const isComplete = data.cpTpPairs.every(p => p.cp && p.tp && (jenisUjian !== 'UJIAN MADRASAH' || p.fase));
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto p-8 bg-white rounded-3xl shadow-2xl border border-[#B2DFDB]">
@@ -111,6 +112,28 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
                       </div>
 
                       <div className="space-y-6">
+                        {jenisUjian === 'UJIAN MADRASAH' && (
+                          <div className="space-y-3">
+                            <div className="flex items-center space-x-2">
+                              <div className="p-1.5 bg-[#E0F2F1] rounded-lg">
+                                <Target className="w-4 h-4 text-[#00796B]" />
+                              </div>
+                              <label className="text-sm font-bold text-gray-700">Pilihan Fase</label>
+                            </div>
+                            <select
+                              value={pair.fase || ''}
+                              onChange={(e) => handleCPTPChange(index, 'fase', e.target.value)}
+                              className="w-full px-5 py-3 rounded-2xl border-2 border-[#E0F2F1] focus:border-[#4DB6AC] outline-none transition-all bg-gray-50/30 text-sm shadow-inner"
+                              required
+                            >
+                              <option value="">Pilih Fase</option>
+                              <option value="Fase A">Fase A</option>
+                              <option value="Fase B">Fase B</option>
+                              <option value="Fase C">Fase C</option>
+                            </select>
+                          </div>
+                        )}
+
                         <div className="space-y-3">
                           <div className="flex items-center space-x-2">
                             <div className="p-1.5 bg-[#E0F2F1] rounded-lg">
@@ -173,11 +196,11 @@ export const Step2: React.FC<Step2Props> = ({ data, examType, onChange, onBack, 
                       </div>
                       <div className="flex-1 truncate">
                         <span className="text-[10px] font-bold block leading-tight">Bagian {idx + 1}</span>
-                        <span className={`text-[8px] truncate block leading-tight font-bold ${pair.cp && pair.tp ? 'text-green-400' : 'text-red-400'}`}>
-                          {pair.cp && pair.tp ? 'Sudah Terisi' : 'Belum Terisi'}
+                        <span className={`text-[8px] truncate block leading-tight font-bold ${pair.cp && pair.tp && (jenisUjian !== 'UJIAN MADRASAH' || pair.fase) ? 'text-green-400' : 'text-red-400'}`}>
+                          {pair.cp && pair.tp && (jenisUjian !== 'UJIAN MADRASAH' || pair.fase) ? 'Sudah Terisi' : 'Belum Terisi'}
                         </span>
                       </div>
-                      {pair.cp && pair.tp && (
+                      {pair.cp && pair.tp && (jenisUjian !== 'UJIAN MADRASAH' || pair.fase) && (
                         <div className="w-1.5 h-1.5 bg-green-400 rounded-full shrink-0"></div>
                       )}
                     </button>
