@@ -2,9 +2,21 @@ import { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, Align
 import { saveAs } from "file-saver";
 import { IdentityData, MainInputData, GeneratorOutput } from "../types";
 import { Buffer } from "buffer";
+import { toArabicNumerals } from "../lib/arabicUtils";
 
 export async function exportToWord(identity: IdentityData, mainInput: MainInputData, output: GeneratorOutput) {
   const isArabic = identity.mataPelajaran === 'Bahasa Arab';
+  const toArabicOption = (char: string) => {
+    const map: Record<string, string> = {
+      'a': 'أ',
+      'b': 'ب',
+      'c': 'ج',
+      'd': 'د',
+      'e': 'هـ'
+    };
+    return map[char.toLowerCase()] || char;
+  };
+  const formatNo = (no: number | string) => isArabic ? toArabicNumerals(no) : `${no}.`;
   const fetchImage = async (prompt: string, seed: number): Promise<Uint8Array | null> => {
     try {
       const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=800&nologo=true&seed=${seed}`;
@@ -103,16 +115,20 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
               }),
               ...output.kisiKisi.map(item => new TableRow({
                 children: [
-                  item.no.toString(),
+                  isArabic ? toArabicNumerals(item.no) : item.no.toString(),
                   item.fase,
                   item.cp,
                   item.materi,
                   item.indikator,
                   item.levelKognitif,
-                  item.noSoal.toString(),
+                  isArabic ? toArabicNumerals(item.noSoal) : item.noSoal.toString(),
                   item.bentukSoal
                 ].map(text => new TableCell({
-                  children: [new Paragraph({ text, alignment: AlignmentType.LEFT })]
+                  children: [new Paragraph({ 
+                    children: [new TextRun({ text, font: isArabic ? "Traditional Arabic" : undefined, size: isArabic ? 24 : undefined })],
+                    bidirectional: isArabic,
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT 
+                  })]
                 }))
               }))
             ]
@@ -181,312 +197,261 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
             const createQuestionTable = async (questions: any[], type: string, extraHeaders?: string[], shuffledAnswers?: string[]) => {
               const rows = [];
+              const isEssayLike = type === "PG" || type === "PGK" || type === "Essay";
               
               // Header if needed
               if (extraHeaders) {
+                const headers = ["NO", "PERNYATAAN", ...extraHeaders];
+                if (isArabic) headers.reverse();
+
                 rows.push(new TableRow({
                   tableHeader: true,
-                  children: [
-                    new TableCell({ shading: { fill: "F2F2F2" }, width: { size: 5, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "NO", alignment: AlignmentType.CENTER, style: "bold" })] }),
-                    new TableCell({ shading: { fill: "F2F2F2" }, children: [new Paragraph({ text: "PERNYATAAN", alignment: AlignmentType.CENTER, style: "bold" })] }),
-                    ...extraHeaders.map(h => new TableCell({ shading: { fill: "F2F2F2" }, width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: h, alignment: AlignmentType.CENTER, style: "bold" })] }))
-                  ]
+                  children: headers.map(text => {
+                    let localizedText = text;
+                    if (isArabic) {
+                      if (text === "NO") localizedText = "رقم";
+                      if (text === "PERNYATAAN") localizedText = "البيان";
+                      if (text === "BENAR") localizedText = "صح";
+                      if (text === "SALAH") localizedText = "خطأ";
+                      if (text === "JAWABAN") localizedText = "الإجابة";
+                    }
+                    return new TableCell({ 
+                      shading: { fill: "F2F2F2" }, 
+                      width: text === "NO" ? { size: 8, type: WidthType.PERCENTAGE } : (text === "PERNYATAAN" ? undefined : { size: 15, type: WidthType.PERCENTAGE }),
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: localizedText, bold: true, size: isArabic ? 26 : undefined, font: isArabic ? "Traditional Arabic" : undefined })], 
+                        alignment: AlignmentType.CENTER 
+                      })] 
+                    });
+                  })
                 }));
               }
 
               for (let idx = 0; idx < questions.length; idx++) {
                 const s = questions[idx];
-                const contentChildren: any[] = [
+                const isPG = type === "PG" || type === "PGK";
+
+                // 1. Question Text Row
+                const questionContent: any[] = [
                   new Paragraph({ 
-                    children: [new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })],
+                    children: [new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined, size: isArabic ? 26 : undefined })],
                     bidirectional: isArabic,
-                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT,
+                    spacing: { before: 100 }
                   })
                 ];
                 
                 if (s.imagePrompt) {
                   const imageBuffer = await fetchImage(s.imagePrompt, s.no);
                   if (imageBuffer) {
-                    contentChildren.push(new Paragraph({
+                    questionContent.push(new Paragraph({
                       children: [
                         new ImageRun({
                           data: imageBuffer,
-                          transformation: { width: 250, height: 250 },
+                          transformation: { width: 200, height: 200 },
                         } as any),
                       ],
                       spacing: { before: 200, after: 200 },
-                      alignment: AlignmentType.CENTER,
+                      alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT,
                     }));
                   }
                 }
 
-                if (type === "PG" || type === "PGK") {
-                  if (s.opsi) {
-                    const options = [
-                      { key: 'a', label: isArabic ? 'أ' : 'a' },
-                      { key: 'b', label: isArabic ? 'ب' : 'b' },
-                      { key: 'c', label: isArabic ? 'ج' : 'c' },
-                      { key: 'd', label: isArabic ? 'د' : 'd' },
-                      { key: 'e', label: isArabic ? 'هـ' : 'e' }
-                    ];
+                const qNoCell = new TableCell({ 
+                  width: { size: 8, type: WidthType.PERCENTAGE }, 
+                  borders: isEssayLike ? { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } } : undefined,
+                  children: [new Paragraph({ 
+                    children: [new TextRun({ text: formatNo(s.no), size: isArabic ? 26 : undefined, bold: true, font: isArabic ? "Traditional Arabic" : undefined })], 
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.CENTER 
+                  })] 
+                });
+                const qMainCell = new TableCell({ 
+                  children: questionContent, 
+                  verticalAlign: VerticalAlign.TOP,
+                  borders: isEssayLike ? { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } } : undefined,
+                });
 
-                    for (const opt of options) {
-                      const val = (s.opsi as any)[opt.key];
-                      if (val) {
-                        contentChildren.push(new Paragraph({ 
-                          children: [new TextRun({ text: isArabic ? `${val} .${opt.label}` : `${opt.label}. ${val}`, font: isArabic ? "Traditional Arabic" : undefined })],
-                          bidirectional: isArabic,
-                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
-                        }));
-                      }
-                    }
-                  }
-                }
-
-                const rowChildren = [
-                  new TableCell({ width: { size: 5, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: `${s.no}.`, alignment: AlignmentType.CENTER })] }),
-                  new TableCell({ children: contentChildren })
-                ];
-
+                const qCells = [qNoCell, qMainCell];
                 if (extraHeaders) {
                   extraHeaders.forEach((h) => {
                     let cellText = "";
                     if (type === "Menjodohkan" && h === "JAWABAN" && shuffledAnswers) {
                       cellText = shuffledAnswers[idx] || "";
                     }
-                    rowChildren.push(new TableCell({ 
+                    qCells.push(new TableCell({ 
                       children: [
                         new Paragraph({ 
-                          children: [new TextRun({ text: cellText, font: isArabic ? "Traditional Arabic" : undefined })],
+                          children: [new TextRun({ text: cellText, font: isArabic ? "Traditional Arabic" : undefined, size: isArabic ? 26 : undefined })],
                           bidirectional: isArabic,
-                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                          alignment: AlignmentType.CENTER
                         })
                       ] 
                     }));
                   });
                 }
 
-                rows.push(new TableRow({ children: rowChildren }));
+                if (isArabic) {
+                  const arCells = [...qCells.slice(2).reverse(), qMainCell, qNoCell];
+                  rows.push(new TableRow({ children: extraHeaders ? arCells : [qMainCell, qNoCell] }));
+                } else {
+                  rows.push(new TableRow({ children: qCells }));
+                }
+
+                // 2. Options Rows (for Multiple Choice)
+                if (isPG && s.opsi) {
+                  const count = Number(type === "PG" ? mainInput.jumlahOpsiPG : mainInput.jumlahOpsiPGK);
+                  const options = [
+                    { key: 'a', label: isArabic ? '.أ' : 'a.' },
+                    { key: 'b', label: isArabic ? '.ب' : 'b.' },
+                    { key: 'c', label: isArabic ? '.ج' : 'c.' },
+                    { key: 'd', label: isArabic ? '.د' : 'd.' },
+                    { key: 'e', label: isArabic ? '.هـ' : 'e.' }
+                  ].slice(0, count);
+
+                  for (const opt of options) {
+                    const val = (s.opsi as any)[opt.key];
+                    if (val) {
+                      const optLabelCell = new TableCell({
+                        width: { size: 8, type: WidthType.PERCENTAGE },
+                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                        children: [new Paragraph({
+                          children: [new TextRun({ text: opt.label, size: isArabic ? 26 : undefined, bold: true, font: isArabic ? "Traditional Arabic" : undefined })],
+                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.CENTER
+                        })]
+                      });
+                      const optValCell = new TableCell({
+                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                        children: [new Paragraph({
+                          children: [new TextRun({ text: val, font: isArabic ? "Traditional Arabic" : undefined, size: isArabic ? 26 : undefined })],
+                          bidirectional: isArabic,
+                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT,
+                          spacing: { before: 50 }
+                        })]
+                      });
+
+                      if (isArabic) {
+                        rows.push(new TableRow({ children: [optValCell, optLabelCell] }));
+                      } else {
+                        rows.push(new TableRow({ children: [optLabelCell, optValCell] }));
+                      }
+                    }
+                  }
+                }
               }
 
               return new Table({
                 width: { size: 100, type: WidthType.PERCENTAGE },
+                borders: isEssayLike ? {
+                  top: { style: BorderStyle.NONE },
+                  bottom: { style: BorderStyle.NONE },
+                  left: { style: BorderStyle.NONE },
+                  right: { style: BorderStyle.NONE },
+                  insideHorizontal: { style: BorderStyle.NONE },
+                  insideVertical: { style: BorderStyle.NONE },
+                } : {
+                  top: { style: BorderStyle.SINGLE, size: 4 },
+                  bottom: { style: BorderStyle.SINGLE, size: 4 },
+                  left: { style: BorderStyle.SINGLE, size: 4 },
+                  right: { style: BorderStyle.SINGLE, size: 4 },
+                  insideHorizontal: { style: BorderStyle.SINGLE, size: 2 },
+                  insideVertical: { style: BorderStyle.SINGLE, size: 2 },
+                },
                 rows: rows
               });
             };
 
             const sections = [
-              { tipe: 'Pilihan Ganda', label: (optionsStr: string) => `Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar!` },
-              { tipe: 'Pilihan Ganda Kompleks', label: (optionsStr: string) => `Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar (Pilih 2 jawaban yang benar)!` },
-              { tipe: 'Menjodohkan', label: () => `Pasangkanlah pernyataan di bawah ini dengan jawaban yang tepat!` },
-              { tipe: 'Benar Salah', label: () => `Berilah tanda centang (√) pada kolom Benar atau Salah!` },
-              { tipe: 'Isian', label: () => `Isilah titik-titik di bawah ini dengan jawaban yang tepat!` },
-              { tipe: 'Uraian', label: () => `Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!` }
+              { 
+                tipe: 'Pilihan Ganda', 
+                label: (optionsStr: string) => isArabic 
+                  ? `أشر بالعلامة (x) على حرف ${optionsStr} أمام أصح الإجابات!` 
+                  : `Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar!` 
+              },
+              { 
+                tipe: 'Pilihan Ganda Kompleks', 
+                label: (optionsStr: string) => isArabic 
+                  ? `أشر بالعلامة (x) على حرف ${optionsStr} أمام أصح الإجابات (اختر إجابتين صحيحتين)!` 
+                  : `Berilah tanda silang (x) pada huruf ${optionsStr} di depan jawaban yang paling benar (Pilih 2 jawaban yang benar)!` 
+              },
+              { 
+                tipe: 'Menjodohkan', 
+                label: () => isArabic 
+                  ? `قم بمطابقة البيانات التالية بالإجابات المناسبة!` 
+                  : `Pasangkanlah pernyataan di bawah ini dengan jawaban yang tepat!` 
+              },
+              { 
+                tipe: 'Benar Salah', 
+                label: () => isArabic 
+                  ? `ضع علامة (√) في عمود صح أو خطأ!` 
+                  : `Berilah tanda centang (√) pada kolom Benar atau Salah!` 
+              },
+              { 
+                tipe: 'Isian', 
+                label: () => isArabic 
+                  ? `املأ الفراغات التالية بالإجابات المناسبة!` 
+                  : `Isilah titik-titik di bawah ini dengan jawaban yang tepat!` 
+              },
+              { 
+                tipe: 'Uraian', 
+                label: () => isArabic 
+                  ? `أجب عن الأسئلة التالية بوضوح!` 
+                  : `Jawablah pertanyaan-pertanyaan di bawah ini dengan benar!` 
+              }
             ];
 
             const activeSections = sections.filter(sec => output.soal.some(s => s.tipe === sec.tipe));
             const romanNumerals = ["I", "II", "III", "IV", "V", "VI"];
-
             for (let idx = 0; idx < activeSections.length; idx++) {
               const sec = activeSections[idx];
               const soalList = output.soal.filter(s => s.tipe === sec.tipe);
               const roman = romanNumerals[idx];
 
-              if (sec.tipe === 'Pilihan Ganda') {
-                const count = Number(mainInput.jumlahOpsiPG);
-                const optionsStr = count === 3 ? "a, b, atau c" : count === 4 ? "a, b, c, atau d" : "a, b, c, d, atau e";
+              if (sec.tipe === 'Pilihan Ganda' || sec.tipe === 'Pilihan Ganda Kompleks') {
+                const count = Number(sec.tipe === 'Pilihan Ganda' ? mainInput.jumlahOpsiPG : mainInput.jumlahOpsiPGK);
+                const optionsStr = isArabic 
+                  ? (count === 3 ? 'أ، ب، أو ج' : count === 4 ? 'أ، ب، ج، أو د' : 'أ، ب، ج، د، أو هـ')
+                  : (count === 3 ? 'a, b, atau c' : count === 4 ? 'a, b, c, atau d' : 'a, b, c, d, atau e');
+                
                 result.push(new Paragraph({
-                  children: [new TextRun({ text: `${roman}. ${sec.label(optionsStr)}`, bold: true })],
+                  children: [new TextRun({ text: `${roman}. ${sec.label(optionsStr)}`, bold: true, size: isArabic ? 28 : undefined, font: isArabic ? "Traditional Arabic" : undefined })],
                   spacing: { before: idx === 0 ? 200 : 400, after: 100 },
-                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
-                }));
-                for (const s of soalList) {
-                  result.push(new Paragraph({
-                    children: [
-                      new TextRun({ text: `${s.no}. `, bold: true }), 
-                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
-                    ],
-                    spacing: { before: 200 },
-                    bidirectional: isArabic,
-                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
-                  }));
-
-                  if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
-                    if (imageBuffer) {
-                      result.push(new Paragraph({
-                        children: [
-                          new ImageRun({
-                            data: imageBuffer,
-                            transformation: { width: 250, height: 250 },
-                          } as any),
-                        ],
-                        spacing: { before: 200, after: 200 },
-                        alignment: AlignmentType.CENTER,
-                      }));
-                    }
-                  }
-
-                  if (s.opsi) {
-                    const options = [
-                      { key: 'a', label: isArabic ? 'أ' : 'a' },
-                      { key: 'b', label: isArabic ? 'ب' : 'b' },
-                      { key: 'c', label: isArabic ? 'ج' : 'c' },
-                      { key: 'd', label: isArabic ? 'د' : 'd' },
-                      { key: 'e', label: isArabic ? 'هـ' : 'e' }
-                    ];
-
-                    for (const opt of options) {
-                      const val = (s.opsi as any)[opt.key];
-                      if (val) {
-                        result.push(new Paragraph({ 
-                          children: [new TextRun({ text: isArabic ? `${val} .${opt.label}` : `${opt.label}. ${val}`, font: isArabic ? "Traditional Arabic" : undefined })],
-                          bidirectional: isArabic,
-                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
-                        }));
-                      }
-                    }
-                  }
-                }
-              } else if (sec.tipe === 'Pilihan Ganda Kompleks') {
-                const count = Number(mainInput.jumlahOpsiPGK);
-                const optionsStr = count === 3 ? "a, b, atau c" : count === 4 ? "a, b, c, atau d" : "a, b, c, d, atau e";
-                result.push(new Paragraph({
-                  children: [new TextRun({ text: `${roman}. ${sec.label(optionsStr)}`, bold: true })],
-                  spacing: { before: 400, after: 100 },
-                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } },
+                  bidirectional: isArabic,
+                  alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                 }));
 
-                for (const s of soalList) {
-                  result.push(new Paragraph({
-                    children: [
-                      new TextRun({ text: `${s.no}. `, bold: true }), 
-                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
-                    ],
-                    spacing: { before: 200 },
-                    bidirectional: isArabic,
-                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
-                  }));
-
-                  if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
-                    if (imageBuffer) {
-                      result.push(new Paragraph({
-                        children: [
-                          new ImageRun({
-                            data: imageBuffer,
-                            transformation: { width: 250, height: 250 },
-                          } as any),
-                        ],
-                        spacing: { before: 200, after: 200 },
-                        alignment: AlignmentType.CENTER,
-                      }));
-                    }
-                  }
-
-                  if (s.opsi) {
-                    const options = [
-                      { key: 'a', label: isArabic ? 'أ' : 'a' },
-                      { key: 'b', label: isArabic ? 'ب' : 'b' },
-                      { key: 'c', label: isArabic ? 'ج' : 'c' },
-                      { key: 'd', label: isArabic ? 'د' : 'd' },
-                      { key: 'e', label: isArabic ? 'هـ' : 'e' }
-                    ];
-
-                    for (const opt of options) {
-                      const val = (s.opsi as any)[opt.key];
-                      if (val) {
-                        result.push(new Paragraph({ 
-                          children: [new TextRun({ text: isArabic ? `${val} .${opt.label}` : `${opt.label}. ${val}`, font: isArabic ? "Traditional Arabic" : undefined })],
-                          bidirectional: isArabic,
-                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
-                        }));
-                      }
-                    }
-                  }
-                }
+                // Use the question table helper for consistent layout
+                result.push(await createQuestionTable(soalList, "PG"));
               } else if (sec.tipe === 'Menjodohkan') {
                 result.push(new Paragraph({
-                  children: [new TextRun({ text: `${roman}. ${sec.label("")}`, bold: true })],
+                  children: [new TextRun({ text: `${roman}. ${sec.label("")}`, bold: true, size: isArabic ? 28 : undefined, font: isArabic ? "Traditional Arabic" : undefined })],
                   spacing: { before: 400, after: 100 },
-                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } },
+                  bidirectional: isArabic,
+                  alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                 }));
                 const answers = soalList.map(s => s.matchingAnswer || s.kunciJawaban).filter(Boolean);
                 const shuffledAnswers = [...answers].sort(() => Math.random() - 0.5);
                 result.push(await createQuestionTable(soalList, "Menjodohkan", ["JAWABAN"], shuffledAnswers));
               } else if (sec.tipe === 'Benar Salah') {
                 result.push(new Paragraph({
-                  children: [new TextRun({ text: `${roman}. ${sec.label("")}`, bold: true })],
+                  children: [new TextRun({ text: `${roman}. ${sec.label("")}`, bold: true, size: isArabic ? 28 : undefined, font: isArabic ? "Traditional Arabic" : undefined })],
                   spacing: { before: 400, after: 100 },
-                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } },
+                  bidirectional: isArabic,
+                  alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                 }));
                 result.push(await createQuestionTable(soalList, "Benar Salah", ["BENAR", "SALAH"]));
-              } else if (sec.tipe === 'Isian') {
+              } else if (sec.tipe === 'Isian' || sec.tipe === 'Uraian') {
                 result.push(new Paragraph({
-                  children: [new TextRun({ text: `${roman}. ${sec.label("")}`, bold: true })],
+                  children: [new TextRun({ text: `${roman}. ${sec.label("")}`, bold: true, size: isArabic ? 28 : undefined, font: isArabic ? "Traditional Arabic" : undefined })],
                   spacing: { before: 400, after: 100 },
-                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
+                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } },
+                  bidirectional: isArabic,
+                  alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
                 }));
 
-                for (const s of soalList) {
-                  result.push(new Paragraph({
-                    children: [
-                      new TextRun({ text: `${s.no}. `, bold: true }), 
-                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
-                    ],
-                    spacing: { before: 200 },
-                    bidirectional: isArabic,
-                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
-                  }));
-                  if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
-                    if (imageBuffer) {
-                      result.push(new Paragraph({
-                        children: [
-                          new ImageRun({
-                            data: imageBuffer,
-                            transformation: { width: 250, height: 250 },
-                          } as any),
-                        ],
-                        spacing: { before: 200, after: 200 },
-                        alignment: AlignmentType.CENTER,
-                      }));
-                    }
-                  }
-                }
-              } else if (sec.tipe === 'Uraian') {
-                result.push(new Paragraph({
-                  children: [new TextRun({ text: `${roman}. ${sec.label("")}`, bold: true })],
-                  spacing: { before: 400, after: 100 },
-                  border: { bottom: { color: "auto", space: 1, style: BorderStyle.SINGLE, size: 6 } }
-                }));
-
-                for (const s of soalList) {
-                  result.push(new Paragraph({
-                    children: [
-                      new TextRun({ text: `${s.no}. `, bold: true }), 
-                      new TextRun({ text: s.pertanyaan, font: isArabic ? "Traditional Arabic" : undefined })
-                    ],
-                    spacing: { before: 200 },
-                    bidirectional: isArabic,
-                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
-                  }));
-                  if (s.imagePrompt) {
-                    const imageBuffer = await fetchImage(s.imagePrompt, s.no);
-                    if (imageBuffer) {
-                      result.push(new Paragraph({
-                        children: [
-                          new ImageRun({
-                            data: imageBuffer,
-                            transformation: { width: 250, height: 250 },
-                          } as any),
-                        ],
-                        spacing: { before: 200, after: 200 },
-                        alignment: AlignmentType.CENTER,
-                      }));
-                    }
-                  }
-                }
+                result.push(await createQuestionTable(soalList, "Essay"));
               }
             }
 
@@ -504,17 +469,31 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
             spacing: { after: 200 },
           }),
 
+          // KUNCI JAWABAN
           ...output.soal.map(s => new Paragraph({
             children: [
-              new TextRun({ text: `${s.no}. `, bold: true }),
-              new TextRun(s.kunciJawaban),
+              new TextRun({ text: formatNo(s.no) + " ", bold: true, size: isArabic ? 26 : undefined, font: isArabic ? "Traditional Arabic" : undefined }),
+              new TextRun({ 
+                text: isArabic && (s.tipe === 'Pilihan Ganda' || s.tipe === 'Pilihan Ganda Kompleks')
+                  ? toArabicOption(s.kunciJawaban || '')
+                  : (s.kunciJawaban || "-"), 
+                font: isArabic ? "Traditional Arabic" : undefined,
+                size: isArabic ? 26 : undefined
+              }),
             ],
+            bidirectional: isArabic,
+            alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
           })),
         ],
       },
     ],
   });
 
-  const blob = await Packer.toBlob(doc);
-  saveAs(blob, `Soal_${identity.mataPelajaran}_Kelas${identity.kelas}.docx`);
+  try {
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `Soal_${identity.mataPelajaran.replace(/\//g, '-')}_Kelas${identity.kelas}.docx`);
+  } catch (error) {
+    console.error("Docx generation error:", error);
+    alert("Gagal membuat file Word. Silakan coba lagi.");
+  }
 }

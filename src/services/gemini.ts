@@ -48,7 +48,7 @@ export async function generateSoalAndKisiKisi(
     - For Isian and Uraian, DO NOT provide any options (opsi).
     - Indicators must be derived from the provided Indikator field in the input, but enhanced with the stimulus pattern for HOTS.
     - The entire content (kisi-kisi, questions, and answer key) must be in:
-      * ${identity.mataPelajaran === 'Bahasa Sunda' ? 'Sundanese (Bahasa Sunda)' : identity.mataPelajaran === 'Bahasa Arab' ? 'Arabic (Bahasa Arab) using proper Arabic script (with harakat if appropriate for MI level)' : 'Indonesian (Bahasa Indonesia)'}.
+      * ${identity.mataPelajaran === 'Bahasa Sunda' ? 'Sundanese (Bahasa Sunda)' : identity.mataPelajaran === 'Bahasa Arab' ? 'Arabic (Bahasa Arab) using proper Arabic script (with harakat if appropriate for MI level). For Arabic, translate section labels for the text/instructions but KEEP the "tipe" field values exactly as: "Pilihan Ganda", "Pilihan Ganda Kompleks", "Menjodohkan", "Benar Salah", "Isian", "Uraian".' : 'Indonesian (Bahasa Indonesia)'}.
     - For Bahasa Arab: The 'pertanyaan' and 'opsi' MUST be in Arabic script. The 'indikator' and 'materi' in Kisi-kisi can be in Indonesian but the 'pertanyaan' in the Soal section MUST be Arabic.
     - For questions that might need an image, provide a descriptive 'imagePrompt'.
     - Ensure the number of questions matches the requested counts.

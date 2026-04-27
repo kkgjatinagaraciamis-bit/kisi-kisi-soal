@@ -62,7 +62,12 @@ export default function App() {
 
   const handleDownload = async () => {
     if (output) {
-      await exportToWord(identity, mainInput, output);
+      try {
+        await exportToWord(identity, mainInput, output);
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Terjadi kesalahan saat mengunduh file.');
+      }
     }
   };
 
