@@ -59,6 +59,7 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
           // IDENTITY TABLE
           new Table({
             width: { size: 100, type: WidthType.PERCENTAGE },
+            visuallyRightToLeft: isArabic,
             borders: {
               top: { style: BorderStyle.NONE },
               bottom: { style: BorderStyle.NONE },
@@ -70,28 +71,30 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
             rows: [
               new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph(`Nama Guru: ${identity.namaGuru}`)] }),
+                  new TableCell({ children: [new Paragraph({ text: `Nama Guru: ${identity.namaGuru}`, bidirectional: isArabic, alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT })] }),
                   new TableCell({ 
                     children: [
-                      new Paragraph(
-                        identity.jenisUjian === 'UJIAN MADRASAH' 
+                      new Paragraph({
+                        text: identity.jenisUjian === 'UJIAN MADRASAH' 
                         ? "UJIAN MADRASAH" 
-                        : `Fase/Kelas/Sem: ${identity.fase}/${identity.kelas}/${identity.semester}`
-                      )
+                        : `Fase/Kelas/Sem: ${identity.fase}/${identity.kelas}/${identity.semester}`,
+                        bidirectional: isArabic,
+                        alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT
+                      })
                     ] 
                   }),
                 ],
               }),
               new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph(`Satuan Pendidikan: ${identity.namaSatuanPendidikan}`)] }),
-                  new TableCell({ children: [new Paragraph(`Tahun Pelajaran: ${identity.tahunPelajaran}`)] }),
+                  new TableCell({ children: [new Paragraph({ text: `Satuan Pendidikan: ${identity.namaSatuanPendidikan}`, bidirectional: isArabic, alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT })] }),
+                  new TableCell({ children: [new Paragraph({ text: `Tahun Pelajaran: ${identity.tahunPelajaran}`, bidirectional: isArabic, alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT })] }),
                 ],
               }),
               new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph(`Mata Pelajaran: ${identity.mataPelajaran}`)] }),
-                  new TableCell({ children: [new Paragraph("")] }),
+                  new TableCell({ children: [new Paragraph({ text: `Mata Pelajaran: ${identity.mataPelajaran}`, bidirectional: isArabic, alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.LEFT })] }),
+                  new TableCell({ children: [new Paragraph({ text: "", bidirectional: isArabic })] }),
                 ],
               }),
             ],
@@ -102,6 +105,7 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
           // KISI-KISI MAIN TABLE
           new Table({
             width: { size: 100, type: WidthType.PERCENTAGE },
+            visuallyRightToLeft: isArabic,
             rows: [
               new TableRow({
                 tableHeader: true,
@@ -202,7 +206,6 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
               // Header if needed
               if (extraHeaders) {
                 const headers = ["NO", "PERNYATAAN", ...extraHeaders];
-                if (isArabic) headers.reverse();
 
                 rows.push(new TableRow({
                   tableHeader: true,
@@ -220,7 +223,8 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                       width: text === "NO" ? { size: 8, type: WidthType.PERCENTAGE } : (text === "PERNYATAAN" ? undefined : { size: 15, type: WidthType.PERCENTAGE }),
                       children: [new Paragraph({ 
                         children: [new TextRun({ text: localizedText, bold: true, size: isArabic ? 26 : undefined, font: isArabic ? "Traditional Arabic" : undefined })], 
-                        alignment: AlignmentType.CENTER 
+                        alignment: AlignmentType.CENTER,
+                        bidirectional: isArabic
                       })] 
                     });
                   })
@@ -262,7 +266,8 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   borders: isEssayLike ? { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } } : undefined,
                   children: [new Paragraph({ 
                     children: [new TextRun({ text: formatNo(s.no), size: isArabic ? 26 : undefined, bold: true, font: isArabic ? "Traditional Arabic" : undefined })], 
-                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.CENTER 
+                    alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.CENTER,
+                    bidirectional: isArabic
                   })] 
                 });
                 const qMainCell = new TableCell({ 
@@ -290,12 +295,7 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                   });
                 }
 
-                if (isArabic) {
-                  const arCells = [...qCells.slice(2).reverse(), qMainCell, qNoCell];
-                  rows.push(new TableRow({ children: extraHeaders ? arCells : [qMainCell, qNoCell] }));
-                } else {
-                  rows.push(new TableRow({ children: qCells }));
-                }
+                rows.push(new TableRow({ children: qCells }));
 
                 // 2. Options Rows (for Multiple Choice)
                 if (isPG && s.opsi) {
@@ -316,7 +316,8 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                         borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
                         children: [new Paragraph({
                           children: [new TextRun({ text: opt.label, size: isArabic ? 26 : undefined, bold: true, font: isArabic ? "Traditional Arabic" : undefined })],
-                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.CENTER
+                          alignment: isArabic ? AlignmentType.RIGHT : AlignmentType.CENTER,
+                          bidirectional: isArabic
                         })]
                       });
                       const optValCell = new TableCell({
@@ -329,11 +330,7 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
                         })]
                       });
 
-                      if (isArabic) {
-                        rows.push(new TableRow({ children: [optValCell, optLabelCell] }));
-                      } else {
-                        rows.push(new TableRow({ children: [optLabelCell, optValCell] }));
-                      }
+                      rows.push(new TableRow({ children: [optLabelCell, optValCell] }));
                     }
                   }
                 }
@@ -341,6 +338,7 @@ export async function exportToWord(identity: IdentityData, mainInput: MainInputD
 
               return new Table({
                 width: { size: 100, type: WidthType.PERCENTAGE },
+                visuallyRightToLeft: isArabic,
                 borders: isEssayLike ? {
                   top: { style: BorderStyle.NONE },
                   bottom: { style: BorderStyle.NONE },
